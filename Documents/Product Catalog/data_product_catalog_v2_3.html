@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ASSIST OCFO — Data Product Catalog</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
+<style>
+:root{
+  --navy:#1a2744;--blue:#1e5fa8;--teal:#0d7377;--orange:#e07b27;
+  --gold:#c9a227;--green:#2a7d4f;--red:#b03030;--purple:#5e3c8f;
+  --slate:#6b7a99;--bg:#f0f3f9;--card:#fff;--border:#dce3ef;--text:#1a2744;--muted:#6b7a99;
+  --dp1:#1e5fa8;--dp2:#0d7377;--dp3:#e07b27;--dp4:#2a7d4f;--dp5:#155d3e;
+  --dp6:#5e3c8f;--dp7:#c9a227;--dp8:#a04010;--dp9:#0a4d8c;--dp10:#b03030;--dp11:#6b7a99;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+
+/* ── Masthead ─────────────────────────────────── */
+.masthead{background:linear-gradient(135deg,var(--navy) 0%,#2a3f70 60%,var(--blue) 100%);color:#fff;
+  padding:2.5rem 2rem 0;border-bottom:4px solid var(--gold);}
+.masthead h1{font-size:1.85rem;font-weight:700;letter-spacing:-0.5px;}
+.masthead .sub{font-size:0.9rem;opacity:.75;margin-top:.3rem;}
+.scoreboard{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:1.5rem;
+  border-top:1px solid rgba(255,255,255,.15);}
+.score-cell{padding:.9rem 1rem;text-align:center;border-right:1px solid rgba(255,255,255,.1);}
+.score-cell:last-child{border-right:none;}
+.score-num{font-size:1.7rem;font-weight:800;display:block;}
+.score-lbl{font-size:.62rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.6px;}
+
+/* ── Tabs ─────────────────────────────────────── */
+.tab-bar{background:var(--navy);display:flex;gap:0;border-bottom:2px solid var(--gold);
+  position:sticky;top:0;z-index:100;overflow-x:auto;}
+.tab-btn{color:rgba(255,255,255,.65);text-decoration:none;cursor:pointer;background:none;border:none;
+  padding:.9rem 1.8rem;font-size:.85rem;font-weight:600;white-space:nowrap;transition:all .2s;
+  border-bottom:3px solid transparent;font-family:inherit;}
+.tab-btn:hover{color:#fff;background:rgba(255,255,255,.08);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* ── Layout ───────────────────────────────────── */
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+.page{max-width:1380px;margin:0 auto;padding:2rem 1.5rem;}
+
+/* ── Tab 1 — Summary Cards ───────────────────── */
+.overview-intro{display:flex;align-items:center;gap:1rem;margin:0 0 2rem;
+  padding:.9rem 1.2rem;background:var(--card);border-radius:10px;
+  border-left:4px solid var(--gold);border:1px solid var(--border);}
+.overview-intro p{font-size:.85rem;color:var(--muted);}
+
+.dp-grid-11{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1.2rem;margin-bottom:2rem;}
+.dp-card{background:var(--card);border-radius:14px;padding:1.5rem;border-top:5px solid;
+  box-shadow:0 2px 8px rgba(26,39,68,.07);display:flex;flex-direction:column;gap:.5rem;}
+.dp-card .dp-num{font-size:.65rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;}
+.dp-card h3{font-size:1.05rem;font-weight:700;line-height:1.3;}
+.dp-card .grain-pill{display:inline-block;background:var(--bg);border:1px solid var(--border);
+  border-radius:20px;padding:.18rem .75rem;font-size:.72rem;font-weight:600;width:fit-content;}
+.dp-card p.tagline{font-size:.82rem;color:var(--muted);flex:1;}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-top:.4rem;}
+.meta-item .lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--muted);display:block;}
+.meta-item .val{font-size:.78rem;font-weight:500;color:var(--text);}
+.shared-dims{margin-top:.6rem;padding:.55rem .7rem;background:#f8faff;border-radius:8px;
+  border:1px solid var(--border);}
+.shared-dims .sd-label{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--muted);margin-bottom:.35rem;}
+.dim-tags{display:flex;flex-wrap:wrap;gap:.3rem;}
+.dim-tag{font-size:.68rem;padding:.15rem .5rem;border-radius:12px;font-weight:600;
+  background:#edf2fc;color:var(--blue);border:1px solid #c0d2f0;}
+.dim-tag.own{background:#eaf6f0;color:var(--teal);border-color:#a0d9c8;}
+.dim-tag.none{background:var(--bg);color:var(--muted);border-color:var(--border);font-style:italic;}
+
+/* ── Tab 2 — Filter Bar ─────────────────────── */
+.filter-bar{position:sticky;top:47px;z-index:90;background:var(--card);
+  border-bottom:2px solid var(--border);padding:.8rem 1.5rem;
+  display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.filter-bar .filter-lbl{font-size:.72rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.6px;color:var(--muted);white-space:nowrap;}
+.filter-group{display:flex;gap:.4rem;flex-wrap:wrap;}
+.f-btn{background:var(--bg);border:1px solid var(--border);border-radius:20px;
+  padding:.22rem .75rem;font-size:.72rem;font-weight:600;cursor:pointer;
+  color:var(--muted);transition:all .15s;font-family:inherit;}
+.f-btn:hover{border-color:var(--blue);color:var(--blue);}
+.f-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.filter-sep{width:1px;height:24px;background:var(--border);}
+.f-clear{font-size:.72rem;font-weight:600;color:var(--blue);cursor:pointer;
+  background:none;border:none;font-family:inherit;text-decoration:underline;}
+.detail-dp{transition:all .2s;}
+.detail-dp.hidden{display:none;}
+
+/* ── Tab 2 — Section Headers ─────────────────── */
+.section-hdr{display:flex;align-items:center;gap:1rem;margin:2.5rem 0 1.2rem;
+  padding-bottom:.7rem;border-bottom:2px solid var(--border);}
+.section-hdr .icon{width:42px;height:42px;border-radius:10px;display:flex;
+  align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.section-hdr h2{font-size:1.3rem;font-weight:700;}
+.section-hdr .sub{font-size:.8rem;color:var(--muted);}
+
+/* ── Schema topology ─────────────────────────── */
+.schema-box{background:#f8faff;border:1px solid var(--border);border-radius:10px;
+  padding:1.1rem 1.3rem;margin-bottom:1.2rem;}
+.schema-box h4{font-size:.72rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--muted);margin-bottom:.7rem;}
+.table-row{display:flex;align-items:baseline;gap:.5rem;margin-bottom:.45rem;}
+.tt{font-size:.62rem;font-weight:800;padding:.1rem .45rem;border-radius:4px;min-width:40px;text-align:center;flex-shrink:0;}
+.tt.fact{background:#e8f0fd;color:var(--blue);}
+.tt.dim{background:#edf7f1;color:var(--green);}
+.tt.view{background:#fff8e8;color:var(--gold);}
+.tname{font-family:"Courier New",monospace;font-size:.8rem;font-weight:600;}
+.tdesc{font-size:.76rem;color:var(--muted);}
+.shared-ref{opacity:.6;}
+
+/* ── ERD ─────────────────────────────────────── */
+.erd-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:1.4rem;margin-bottom:1.2rem;overflow-x:auto;}
+.erd-wrap h4{font-size:.72rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--muted);margin-bottom:1rem;}
+.mermaid{min-width:600px;}
+
+/* ── Column tables ───────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:1.4rem;margin-bottom:1.2rem;}
+.card h3{font-size:1rem;font-weight:700;margin-bottom:.5rem;}
+.card p{font-size:.85rem;color:var(--muted);}
+.col-tbl{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:.6rem;}
+.col-tbl th{background:var(--navy);color:#fff;padding:.5rem .7rem;
+  text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.col-tbl td{padding:.42rem .7rem;border-bottom:1px solid var(--border);vertical-align:top;}
+.col-tbl tr:last-child td{border-bottom:none;}
+.col-tbl tr:hover td{background:#f8faff;}
+.gen-badge{background:#5e3c8f;color:#fff;font-size:.6rem;padding:.1rem .35rem;border-radius:3px;font-weight:700;}
+.cn{font-family:"Courier New",monospace;font-weight:600;color:var(--navy);}
+.ct{color:var(--blue);font-family:monospace;}
+.cn2{color:var(--muted);font-size:.75rem;}
+
+/* ── DP4-11 detail cards ─────────────────────── */
+.dp-detail-card{background:var(--card);border-radius:14px;overflow:hidden;
+  border:1px solid var(--border);margin-bottom:1.2rem;
+  box-shadow:0 2px 8px rgba(26,39,68,.06);}
+.dp-detail-card .dc-header{padding:1.3rem 1.6rem;border-left:5px solid;}
+.dp-detail-card .dc-header .dc-num{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:.2rem;}
+.dp-detail-card .dc-header h3{font-size:1.2rem;font-weight:700;margin-bottom:.3rem;}
+.dp-detail-card .dc-header p{font-size:.83rem;color:var(--muted);}
+.dc-body{padding:1.2rem 1.6rem;}
+.dc-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-bottom:1.1rem;}
+@media(max-width:720px){.dc-two-col{grid-template-columns:1fr;}}
+.info-box{background:#f8faff;border:1px solid var(--border);border-radius:10px;padding:1rem 1.2rem;}
+.info-box h4{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:.6rem;}
+.info-box p{font-size:.81rem;}
+.consumer-pills{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.7rem;}
+.cpill{font-size:.73rem;font-weight:600;padding:.22rem .65rem;border-radius:6px;
+  background:rgba(26,39,68,.06);border:1px solid var(--border);}
+.star-schema{background:#f8faff;border:1px solid var(--border);border-radius:10px;
+  padding:1rem 1.2rem;margin-bottom:1rem;}
+.star-schema h4{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:.7rem;}
+.star-row{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.4rem;}
+.s-fact{background:#e8f0fd;color:var(--blue);border:1px solid #c0d2f0;border-radius:6px;
+  padding:.2rem .6rem;font-size:.75rem;font-weight:700;font-family:"Courier New",monospace;}
+.s-dim{background:#edf7f1;color:var(--green);border:1px solid #a0d9c8;border-radius:6px;
+  padding:.2rem .6rem;font-size:.72rem;font-weight:600;font-family:"Courier New",monospace;}
+.s-dim.shared{background:#fff8e8;color:#a06000;border-color:#f0d090;}
+.s-view{background:#f3eeff;color:var(--purple);border:1px solid #d0b8f0;border-radius:6px;
+  padding:.2rem .6rem;font-size:.72rem;font-weight:600;font-family:"Courier New",monospace;}
+.s-arr{color:var(--muted);font-size:.85rem;}
+.src-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.3rem;}
+.src-item{font-family:"Courier New",monospace;font-size:.73rem;padding:.25rem .55rem;
+  background:var(--bg);border:1px solid var(--border);border-radius:5px;
+  display:flex;align-items:center;gap:.4rem;color:var(--muted);}
+.src-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.reg-row{font-size:.78rem;color:var(--muted);padding:.4rem 0;border-bottom:1px solid var(--border);}
+.reg-row:last-child{border-bottom:none;}
+.reg-row strong{color:var(--navy);}
+
+/* ── Tab 3 — Dependency Graph ───────────────── */
+.dep-wrap{background:var(--card);border-radius:14px;border:1px solid var(--border);
+  padding:1.5rem;overflow-x:auto;}
+.dep-wrap h3{font-size:1rem;font-weight:700;margin-bottom:.5rem;}
+.dep-wrap p{font-size:.83rem;color:var(--muted);margin-bottom:1.2rem;}
+.dep-legend{display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1.2rem;
+  padding:.8rem 1rem;background:var(--bg);border-radius:8px;border:1px solid var(--border);}
+.dl-item{display:flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:600;}
+
+/* ── Regulatory section ───────────────────────── */
+.reg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;}
+.reg-card{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:1rem;border-left:4px solid var(--navy);}
+.reg-card .ref{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:.25rem;}
+.reg-card .title{font-size:.86rem;font-weight:700;margin-bottom:.35rem;}
+.reg-card p{font-size:.78rem;color:var(--muted);}
+
+/* ── Lineage table ───────────────────────────── */
+.lin-tbl{width:100%;border-collapse:collapse;font-size:.8rem;}
+.lin-tbl th{background:var(--navy);color:#fff;padding:.55rem .8rem;
+  text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.lin-tbl td{padding:.45rem .8rem;border-bottom:1px solid var(--border);}
+.lin-tbl tr:hover td{background:#f8faff;}
+.lin-tbl code{background:var(--bg);padding:.1rem .35rem;border-radius:3px;font-family:monospace;font-size:.78rem;}
+.arr{color:var(--blue);font-weight:700;}
+
+footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;
+  padding:1.8rem;font-size:.78rem;margin-top:3rem;}
+footer strong{color:rgba(255,255,255,.8);}
+
+@media(max-width:640px){
+  .dp-grid-11{grid-template-columns:1fr;}
+  .scoreboard{grid-template-columns:repeat(3,1fr);}
+  .filter-bar{position:static;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ HEADER ═══════════════════════════════════════════════════════ -->
+<div class="masthead">
+  <div class="page" style="padding-top:0;padding-bottom:0;">
+    <h1>ASSIST OCFO — Data Product Catalog</h1>
+    <div class="sub">ASSIST Acquisition Lifecycle · Pre-Award through Closeout · Databricks Unity Catalog · Delta Lake</div>
+    <div class="scoreboard">
+      <div class="score-cell"><span class="score-num" style="color:var(--gold);">11</span><span class="score-lbl">Data Products</span></div>
+      <div class="score-cell"><span class="score-num" style="color:#7ec8e3;">209</span><span class="score-lbl">Source Tables Mapped</span></div>
+      <div class="score-cell"><span class="score-num" style="color:#a0e0b8;">11</span><span class="score-lbl">Gold Schemas</span></div>
+      <div class="score-cell"><span class="score-num" style="color:#f0c090;">7</span><span class="score-lbl">Shared Conformed Dims</span></div>
+      <div class="score-cell"><span class="score-num" style="color:#d0b8f0;">5</span><span class="score-lbl">Regulatory Frameworks</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAB BAR ═══════════════════════════════════════════════════════ -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('catalog',this)">📦 Catalog</button>
+  <button class="tab-btn" onclick="switchTab('detail',this)">🔍 Detail</button>
+  <button class="tab-btn" onclick="switchTab('dependency',this)">🌐 Dependency Graph</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TAB 1 — CATALOG (All 11 Summary Cards)
+════════════════════════════════════════════════════════════════════════ -->
+<div id="tab-catalog" class="tab-panel active">
+<div class="page">
+
+<div class="overview-intro">
+  <span style="font-size:1.8rem;">📋</span>
+  <p>All 11 data products spanning the complete ASSIST Acquisition Lifecycle. Each product owns a discrete Gold schema in <strong>assist_catalog</strong> and publishes a defined set of facts, dimensions, and analytical views. Shared conformed dimensions are owned by DP1 (<code>assist_catalog.common</code>) and referenced across products.</p>
+</div>
+
+<div class="dp-grid-11">
+
+  <!-- DP1 -->
+  <div class="dp-card" style="border-color:var(--dp1);">
+    <div class="dp-num" style="color:var(--dp1);">DP1 · Financial · Post-Award</div>
+    <h3>Obligation &amp; Expenditure Tracker</h3>
+    <div class="grain-pill">⚙ Grain: CLIN/SLIN × LOA (line_item_accepted)</div>
+    <p class="tagline">Core financial system-of-record. Tracks the full money lifecycle — LOA funding → obligation → invoice → acceptance → billing → accrual → UDO. Primary source for CFO P&amp;L and Treasury reporting.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.oet</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">fin_svc · fund_svc</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_obligation_expenditure</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">CFO, OMB, Treasury</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">FASAB SFFAS 1, OMB A-11</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">~22 (aasbs + accrual)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Shared Dimensions</div>
+      <div class="dim-tags">
+        <span class="dim-tag own">✦ Owns all 7 common dims</span>
+        <span class="dim-tag own">dim_date · dim_agency · dim_ia</span>
+        <span class="dim-tag own">dim_award · dim_line_item · dim_loa · dim_funding</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP2 -->
+  <div class="dp-card" style="border-color:var(--dp2);">
+    <div class="dp-num" style="color:var(--dp2);">DP2 · Lifecycle · Full Lifecycle</div>
+    <h3>Full Award Lifecycle Tracker</h3>
+    <div class="grain-pill">⚙ Grain: CLIN/SLIN with lifecycle snapshot</div>
+    <p class="tagline">Composite cross-domain product spanning all acquisition phases. One queryable row per CLIN/SLIN with pre-award dates, award milestone dates, expenditure status, and closeout completion.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.alt</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">award_svc (composite)</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_award_lifecycle</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">COs, PMs, Closeout Team</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">FAR Part 7, FAR 4.804</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">~12 (aasbs)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Reads from DP1 Common</div>
+      <div class="dim-tags">
+        <span class="dim-tag">dim_award</span><span class="dim-tag">dim_line_item</span>
+        <span class="dim-tag">dim_agency</span><span class="dim-tag">dim_ia</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP3 -->
+  <div class="dp-card" style="border-color:var(--dp3);">
+    <div class="dp-num" style="color:var(--dp3);">DP3 · Transparency · Award</div>
+    <h3>FPDS-NG Reporting Extract</h3>
+    <div class="grain-pill">⚙ Grain: Award Modification (award_mod)</div>
+    <p class="tagline">Regulatory reporting extract for FPDS-NG and USASpending.gov. One row per reportable contract action (CAR). Near-real-time trigger on award mod finalization. FAR 4.604 compliance.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.fre</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">award_svc</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_fpds_transaction</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">FPDS-NG, USASpending, OIG</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">FAR 4.604, FFATA, DATA Act</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">~8 (aasbs + transmit)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Reads from DP1 Common</div>
+      <div class="dim-tags">
+        <span class="dim-tag">dim_date</span><span class="dim-tag">dim_agency</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP4 -->
+  <div class="dp-card" style="border-color:var(--dp4);">
+    <div class="dp-num" style="color:var(--dp4);">DP4 · Financial · Post-Award</div>
+    <h3>Accrual Income &amp; GSA Revenue Tracker</h3>
+    <div class="grain-pill">⚙ Grain: accrual_income_dist (CLIN × LOA × month)</div>
+    <p class="tagline">Revenue-side complement to DP1. Tracks GSA income earned from client agencies, accrual calculations, and BAAR transmission to Treasury. Closes the income/expense loop required by FASAB SFFAS 7.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.air</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">fin_svc</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_accrual_income</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">CFO, BAAR, Revenue Accountants</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">FASAB SFFAS 7, OMB A-136</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">16 (aasbs + accrual)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Reads from DP1 Common + Enriches DP1</div>
+      <div class="dim-tags">
+        <span class="dim-tag">dim_line_item</span><span class="dim-tag">dim_loa</span>
+        <span class="dim-tag">dim_ia</span><span class="dim-tag">dim_agency</span>
+        <span class="dim-tag" style="background:#fff0f0;color:#b03030;border-color:#f0a0a0;">↺ enriches DP1.accrued_amt</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP5 -->
+  <div class="dp-card" style="border-color:var(--dp5);">
+    <div class="dp-num" style="color:var(--dp5);">DP5 · Financial · Post-Award</div>
+    <h3>Treasury Transmission &amp; Payment Pipeline</h3>
+    <div class="grain-pill">⚙ Grain: transmittal (per Pegasys batch)</div>
+    <p class="tagline">End-to-end visibility of every financial transmission from ASSIST to Treasury (Pegasys, VITAP, BAAR, IPAC). Tracks PO → billing → receiving report → payment with error logging. Prompt Payment Act SLA monitoring.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.tpp</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">fin_svc</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_transmission_event</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">Treasury Ops, CFO Payments, OIG</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">Prompt Payment Act, TFM Vol I Pt 2</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">23 (aasbs_transmit + billing)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Reads from DP1 Common</div>
+      <div class="dim-tags">
+        <span class="dim-tag">dim_loa</span><span class="dim-tag">dim_funding</span>
+        <span class="dim-tag">dim_agency</span><span class="dim-tag">dim_date</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP6 -->
+  <div class="dp-card" style="border-color:var(--dp6);">
+    <div class="dp-num" style="color:var(--dp6);">DP6 · Award · Award / Post-Award</div>
+    <h3>CLIN Pricing &amp; Service Charge Catalog</h3>
+    <div class="grain-pill">⚙ Grain: service_charge_schedule (billing period per CLIN)</div>
+    <p class="tagline">Detailed CLIN subtype pricing — labor rates by cost type, fixed fee schedules, travel vouchers, and award fee structures. Enables planned vs. actual cost rate analysis and billing schedule health monitoring.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.psc</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">li_svc · fin_svc</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_billing_schedule</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">FMAs, Price Analysts, Billing Ops</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">FAR 15.404, FAR 52.232-7</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">14 (aasbs billing subtypes)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Reads from DP1 Common</div>
+      <div class="dim-tags">
+        <span class="dim-tag">dim_line_item</span><span class="dim-tag">dim_award</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP7 -->
+  <div class="dp-card" style="border-color:var(--dp7);">
+    <div class="dp-num" style="color:var(--dp7);">DP7 · Market · Pre-Award</div>
+    <h3>Solicitation &amp; Market Intelligence</h3>
+    <div class="grain-pill">⚙ Grain: solicit_response (contractor × solicitation)</div>
+    <p class="tagline">Competitive landscape data — who responded to each solicitation, at what price, whether they won, and how postings reached the market. Powers price reasonableness benchmarking and small business competition analytics.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.smi</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">sol_svc · acq_svc</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_solicit_response</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">COs, Price Analysts, SB Office</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">FAR 15.404, FAR Part 19 (SB)</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">13 (aasbs sol + acq tables)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Reads from DP1 Common</div>
+      <div class="dim-tags">
+        <span class="dim-tag">dim_agency</span><span class="dim-tag">dim_date</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP8 -->
+  <div class="dp-card" style="border-color:var(--dp8);">
+    <div class="dp-num" style="color:var(--dp8);">DP8 · Workforce · Cross-Cutting</div>
+    <h3>Workforce &amp; Personnel Registry</h3>
+    <div class="grain-pill">⚙ Grain: role_assignment (user × entity × role)</div>
+    <p class="tagline">Who owns what — CO, COR, FMA, PM, and client representative assignments across every award, IA, funding package, and solicitation. Enables workload distribution analysis and COR delegation compliance tracking.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.wpr</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">common_svc (user/role)</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_role_assignment</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">HR, Regional Directors, CO Supervisors</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">FAR 1.602-2 (COR delegation)</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">~14 (assist.users + role tables)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Reads from DP1 Common</div>
+      <div class="dim-tags">
+        <span class="dim-tag">dim_award</span><span class="dim-tag">dim_ia</span>
+        <span class="dim-tag">dim_agency</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP9 -->
+  <div class="dp-card" style="border-color:var(--dp9);">
+    <div class="dp-num" style="color:var(--dp9);">DP9 · IA · Pre-Award / Award</div>
+    <h3>IA Lifecycle &amp; Amendment Tracker</h3>
+    <div class="grain-pill">⚙ Grain: ia_amendment (per amendment event)</div>
+    <p class="tagline">Full amendment history for Interagency Agreements — scope changes, cost adjustments, period extensions, annual review cadence, and FIN code history. Enables IA health scoring and renewal risk prediction.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.iat</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">ia_svc · fund_svc</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_ia_amendment</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">IA Program Managers, CFO Analysts</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">FAR Part 17.5, OMB A-123</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">10 (aasbs ia + funding tables)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Reads from DP1 Common</div>
+      <div class="dim-tags">
+        <span class="dim-tag">dim_ia</span><span class="dim-tag">dim_agency</span>
+        <span class="dim-tag">dim_funding</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP10 -->
+  <div class="dp-card" style="border-color:var(--dp10);">
+    <div class="dp-num" style="color:var(--dp10);">DP10 · Audit · Cross-Cutting</div>
+    <h3>Collaboration, Review &amp; Audit Trail</h3>
+    <div class="grain-pill">⚙ Grain: chronology_event (one row per lifecycle event)</div>
+    <p class="tagline">System-of-record for internal workflow decisions — pre-award reviews (legal, technical, price), collaboration requests, comment threads, and full lifecycle event chronology. Primary source for OIG document requests.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.cat</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">common_svc (collab + workflow)</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">fact_lifecycle_event</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">OIG, Compliance, Legal, COs</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">OMB A-123, Inspector General Act</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">11 (central_collab + chronology)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Reads from DP1 Common</div>
+      <div class="dim-tags">
+        <span class="dim-tag">dim_award</span><span class="dim-tag">dim_ia</span>
+        <span class="dim-tag">dim_agency</span><span class="dim-tag">dim_date</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DP11 -->
+  <div class="dp-card" style="border-color:var(--dp11);">
+    <div class="dp-num" style="color:var(--dp11);">DP11 · Reference · Cross-Cutting</div>
+    <h3>Conformed Reference Data Catalog</h3>
+    <div class="grain-pill">⚙ Grain: lookup code (cd per domain)</div>
+    <p class="tagline">All 61 lookup/decode tables published as a single versioned Delta Lake reference product. Enables any downstream consumer to self-serve code descriptions without joining back to source operational tables.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><span class="lbl">Gold Schema</span><span class="val">assist_catalog.ref</span></div>
+      <div class="meta-item"><span class="lbl">Source Domain</span><span class="val">common_svc (all lu_ tables)</span></div>
+      <div class="meta-item"><span class="lbl">Fact Table</span><span class="val">N/A — reference only</span></div>
+      <div class="meta-item"><span class="lbl">Consumers</span><span class="val">All Data Products (DP1–DP10)</span></div>
+      <div class="meta-item"><span class="lbl">Regulatory</span><span class="val">N/A — decode tables</span></div>
+      <div class="meta-item"><span class="lbl">Source Tables</span><span class="val">61 lu_* tables (aasbs + aasbs_transmit)</span></div>
+    </div>
+    <div class="shared-dims">
+      <div class="sd-label">Standalone — No DP1 dependency</div>
+      <div class="dim-tags">
+        <span class="dim-tag none">Provides lookup decodes to all 10 other products</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.dp-grid-11 -->
+</div><!-- /.page -->
+</div><!-- /#tab-catalog -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TAB 2 — DETAIL (Filter + Full Details)
+════════════════════════════════════════════════════════════════════════ -->
+<div id="tab-detail" class="tab-panel">
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+  <span class="filter-lbl">Phase:</span>
+  <div class="filter-group" id="fg-phase">
+    <button class="f-btn active" data-filter="phase" data-val="all">All</button>
+    <button class="f-btn" data-filter="phase" data-val="pre-award">Pre-Award</button>
+    <button class="f-btn" data-filter="phase" data-val="award">Award</button>
+    <button class="f-btn" data-filter="phase" data-val="post-award">Post-Award</button>
+    <button class="f-btn" data-filter="phase" data-val="cross-cutting">Cross-Cutting</button>
+  </div>
+  <div class="filter-sep"></div>
+  <span class="filter-lbl">Schema:</span>
+  <div class="filter-group" id="fg-schema">
+    <button class="f-btn active" data-filter="schema" data-val="all">All</button>
+    <button class="f-btn" data-filter="schema" data-val="oet">oet</button>
+    <button class="f-btn" data-filter="schema" data-val="alt">alt</button>
+    <button class="f-btn" data-filter="schema" data-val="fre">fre</button>
+    <button class="f-btn" data-filter="schema" data-val="air">air</button>
+    <button class="f-btn" data-filter="schema" data-val="tpp">tpp</button>
+    <button class="f-btn" data-filter="schema" data-val="psc">psc</button>
+    <button class="f-btn" data-filter="schema" data-val="smi">smi</button>
+    <button class="f-btn" data-filter="schema" data-val="wpr">wpr</button>
+    <button class="f-btn" data-filter="schema" data-val="iat">iat</button>
+    <button class="f-btn" data-filter="schema" data-val="cat">cat</button>
+    <button class="f-btn" data-filter="schema" data-val="ref">ref</button>
+  </div>
+  <div class="filter-sep"></div>
+  <button class="f-clear" onclick="clearFilters()">Clear filters</button>
+</div>
+
+<div class="page">
+
+<!-- ─── DP1 Detail ──────────────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp1" data-phase="post-award" data-schema="oet">
+<div class="section-hdr">
+  <div class="icon" style="background:#edf2fc;color:var(--dp1);">💰</div>
+  <div><h2 style="color:var(--dp1);">DP1 · Obligation &amp; Expenditure Tracker</h2>
+  <div class="sub">assist_catalog.oet · CLIN/SLIN × LOA grain · CFO + Treasury consumer</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#edf2fc;color:var(--dp1);border:1px solid #c0d2f0;white-space:nowrap;">FASAB SFFAS 1 · OMB A-11</span>
+</div>
+<div class="schema-box">
+  <h4>Schema Topology — assist_catalog.oet + assist_catalog.common</h4>
+  <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_obligation_expenditure</span><span class="tdesc">— Core financial fact. One row per CLIN/SLIN × LOA. Partitioned by fy_date_key.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">common.dim_line_item</span><span class="tdesc">— CLIN/SLIN attributes. SCD2. li_tracking_num stable across mods.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">common.dim_loa</span><span class="tdesc">— Line of Accounting (TAS/USSGL). SCD2. tracking_num as natural key.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">common.dim_funding</span><span class="tdesc">— Funding package with latest amendment snapshot. SCD2.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">common.dim_award</span><span class="tdesc">— Award + latest mod snapshot. SCD2. Partitioned by award_fy.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">common.dim_ia</span><span class="tdesc">— Interagency Agreement (GT&amp;C / IAA). SCD2. Partitioned by fiscal_year.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">common.dim_agency</span><span class="tdesc">— Federal agency/bureau hierarchy. SCD2. activity_address_cd as natural key.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">common.dim_date</span><span class="tdesc">— Conformed date dim with USG fiscal calendar (Oct 1 start). Static spine.</span></div>
+  <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_cfo_obligation_summary</span><span class="tdesc">— Agency/IA/FY rollup for CFO executive reporting.</span></div>
+  <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_clin_expenditure_detail</span><span class="tdesc">— Full CLIN-level analyst drill-down.</span></div>
+  <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_udo_aging</span><span class="tdesc">— UDO aging buckets: Active / Under 1yr / 1-2yr / Over 2yr.</span></div>
+</div>
+<div class="erd-wrap"><h4>Entity Relationship Diagram — DP1 (Crow's Foot Notation)</h4>
+<div class="mermaid">
+erDiagram
+    FACT_OBL_EXPENDITURE {
+        bigint obligation_sk PK
+        bigint line_item_sk
+        bigint loa_sk
+        bigint funding_sk
+        bigint award_sk
+        bigint ia_sk
+        bigint agency_sk
+        int snapshot_date_sk
+        int fiscal_year
+        decimal committed_amt
+        decimal obligated_amt
+        decimal accepted_amt
+        decimal udo_amt
+        decimal accrued_amt
+        string loa_transaction_type_cd
+    }
+    DIM_LINE_ITEM {
+        bigint line_item_sk PK
+        bigint line_item_accepted_id
+        string clin_num
+        decimal obligated_ceiling_amt
+        boolean is_current_flag
+    }
+    DIM_LOA {
+        bigint loa_sk PK
+        string treasury_account_symbol
+        string fund_cd
+        boolean is_current_flag
+    }
+    DIM_FUNDING {
+        bigint funding_sk PK
+        string fund_status_cd
+        string billing_type_cd
+    }
+    DIM_AWARD {
+        bigint award_sk PK
+        string award_piid
+        boolean is_current_flag
+    }
+    DIM_IA {
+        bigint ia_sk PK
+        string ia_num
+        int fiscal_year
+        boolean is_current_flag
+    }
+    DIM_AGENCY {
+        bigint agency_sk PK
+        string activity_address_cd
+        string agency_name
+    }
+    DIM_DATE {
+        int date_sk PK
+        int federal_fiscal_fy
+        int federal_fiscal_qtr
+    }
+    FACT_OBL_EXPENDITURE }o--|| DIM_LINE_ITEM : contains
+    FACT_OBL_EXPENDITURE }o--|| DIM_LOA : "funded by"
+    FACT_OBL_EXPENDITURE }o--|| DIM_FUNDING : "under funding"
+    FACT_OBL_EXPENDITURE }o--|| DIM_AWARD : "against award"
+    FACT_OBL_EXPENDITURE }o--o| DIM_IA : "via IA"
+    FACT_OBL_EXPENDITURE }o--|| DIM_AGENCY : "contracted by"
+    FACT_OBL_EXPENDITURE }o--|| DIM_DATE : "snapshot date"
+</div></div>
+<div class="card">
+  <h3>Key Measures — fact_obligation_expenditure</h3>
+  <p style="margin-bottom:.8rem;">All monetary amounts are <code>DECIMAL(15,2)</code>. Positive = obligation; negative = de-obligation/reversal.</p>
+  <table class="col-tbl">
+    <tr><th>Column</th><th>Type</th><th>Source</th><th>Description</th></tr>
+    <tr><td><span class="cn">committed_amt</span></td><td><span class="ct">DECIMAL(15,2)</span></td><td>loa_ledger</td><td class="cn2">Pre-obligation commitment — USSGL 4700</td></tr>
+    <tr><td><span class="cn">obligated_amt</span></td><td><span class="ct">DECIMAL(15,2)</span></td><td>loa_ledger</td><td class="cn2">Legally obligated dollars — USSGL 4801/4802 (FAR 1.602-1 event)</td></tr>
+    <tr><td><span class="cn">invoiced_amt</span></td><td><span class="ct">DECIMAL(15,2)</span></td><td>invoice</td><td class="cn2">Total invoiced by contractor</td></tr>
+    <tr><td><span class="cn">accepted_amt</span></td><td><span class="ct">DECIMAL(15,2)</span></td><td>acceptance_item</td><td class="cn2">GSA-authorized acceptance — USSGL 6100</td></tr>
+    <tr><td><span class="cn">billed_amt</span></td><td><span class="ct">DECIMAL(15,2)</span></td><td>bill_item</td><td class="cn2">Amount billed to client agency</td></tr>
+    <tr><td><span class="cn">accrued_amt</span></td><td><span class="ct">DECIMAL(15,2)</span></td><td>DP4 (enriched)</td><td class="cn2">Month-end accrual estimate — seeded 0.00, enriched by DP4 CDC</td></tr>
+    <tr><td><span class="cn">udo_amt</span></td><td><span class="ct">DECIMAL(15,2)</span></td><td>Derived</td><td class="cn2">Unliquidated obligation = obligated_amt − accepted_amt</td></tr>
+    <tr><td><span class="cn">service_charge_amt</span></td><td><span class="ct">DECIMAL(15,2)</span></td><td>bill_item</td><td class="cn2">GSA fee billed to client agency</td></tr>
+    <tr><td><span class="cn">undelivered_orders_amt</span> <span class="gen-badge">DERIVED</span></td><td><span class="ct">DECIMAL(15,2)</span></td><td>Derived</td><td class="cn2">Obligated but not yet invoiced</td></tr>
+  </table>
+</div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (18)</h4>
+    <div class="src-list">
+      <div class="src-item" title="Base grain — one row per accepted CLIN/SLIN"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.line_item_accepted</div>
+      <div class="src-item" title="Obligation amounts: committed, certified, obligated"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.loa_ledger</div>
+      <div class="src-item" title="Line of Accounting — TAS, fund type, status"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.loa</div>
+      <div class="src-item" title="Funding package header"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.funding</div>
+      <div class="src-item" title="Incremental funding tranche per package"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.funding_amendment</div>
+      <div class="src-item" title="LOA-level dollar allocation per amendment"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.funding_amendment_loa</div>
+      <div class="src-item" title="CLIN/SLIN attributes and ceiling amount"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.line_item</div>
+      <div class="src-item" title="Contract award header — PIID, type, dates"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.award</div>
+      <div class="src-item" title="Modification history"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.award_mod</div>
+      <div class="src-item" title="Contractor identity per mod"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.award_mod_company</div>
+      <div class="src-item" title="Interagency Agreement header"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.ia</div>
+      <div class="src-item" title="Contractor invoices received"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.invoice</div>
+      <div class="src-item" title="GSA-accepted invoice line items"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.acceptance_item</div>
+      <div class="src-item" title="Service charges billed to client agency"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.bill_item</div>
+      <div class="src-item" title="Month-end accrual expense estimate"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.accrual_expense</div>
+      <div class="src-item" title="Pegasys payment disbursements"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.disbursement</div>
+      <div class="src-item" title="Acquisition record — ia_id join path"><span class="src-dot" style="background:#c9a227;"></span>aasbs.acquisition</div>
+      <div class="src-item" title="Federal agency/bureau/AAC hierarchy"><span class="src-dot" style="background:#6b7a99;"></span>table_master.lu_federal_agency</div>
+    </div>
+</div><!-- /#detail-dp1 -->
+
+<!-- ─── DP2 Detail ──────────────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp2" data-phase="pre-award award post-award" data-schema="alt">
+<div class="section-hdr">
+  <div class="icon" style="background:#eaf6f0;color:var(--dp2);">📋</div>
+  <div><h2 style="color:var(--dp2);">DP2 · Full Award Lifecycle Tracker</h2>
+  <div class="sub">assist_catalog.alt · CLIN/SLIN grain · Full lifecycle — pre-award through closeout</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#eaf6f0;color:var(--dp2);border:1px solid #a0d9c8;white-space:nowrap;">FAR Part 7 · FAR 4.804</span>
+</div>
+<div class="schema-box">
+  <h4>Schema Topology — assist_catalog.alt</h4>
+  <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_award_lifecycle</span><span class="tdesc">— Full lifecycle snapshot per CLIN/SLIN. Key metric: days_in_pre_award.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_acquisition</span><span class="tdesc">— Pre-award planning: IGCE, competition type, performance type. SCD2.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_solicitation</span><span class="tdesc">— Solicitation with amendment count and bid count at award.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_contractor</span><span class="tdesc">— Awardee identity (UEI/DUNS, business type, small business class). SCD2.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_closeout</span><span class="tdesc">— Closeout status, checklist completion %, prohibition codes.</span></div>
+  <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_award</span><span class="tdesc">— Shared from DP1.</span></div>
+  <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_line_item</span><span class="tdesc">— Shared from DP1.</span></div>
+  <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_agency</span><span class="tdesc">— Shared from DP1.</span></div>
+  <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_ia</span><span class="tdesc">— Shared from DP1.</span></div>
+  <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_co_active_awards</span><span class="tdesc">— CO dashboard: active awards, burn rate, days to PoP end.</span></div>
+  <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_acquisition_cycle_time</span><span class="tdesc">— Pre-award duration analytics by region, type, competition.</span></div>
+  <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_closeout_status</span><span class="tdesc">— Closeout aging: CO_PENDING, FMA_PENDING, BLOCKED, COMPLETE.</span></div>
+</div>
+<div class="erd-wrap"><h4>Entity Relationship Diagram — DP2 (Crow's Foot Notation)</h4>
+<div class="mermaid">
+erDiagram
+    FACT_AWARD_LIFECYCLE {
+        bigint lifecycle_sk PK
+        bigint acquisition_sk
+        bigint solicitation_sk
+        bigint award_sk
+        bigint contractor_sk
+        bigint closeout_sk
+        bigint line_item_sk
+        string current_proc_phase_cd
+        int days_in_pre_award
+        int days_to_pop_end
+        decimal current_obligated_amt
+        decimal current_udo_amt
+    }
+    DIM_ACQUISITION {
+        bigint acquisition_sk PK
+        string competition_type_cd
+        string performance_type_cd
+        decimal igce_amt
+    }
+    DIM_SOLICITATION {
+        bigint solicitation_sk PK
+        string sol_status_cd
+        int total_responses
+    }
+    DIM_CONTRACTOR {
+        bigint contractor_sk PK
+        string uei
+        string company_name
+        boolean small_business_flag
+    }
+    DIM_CLOSEOUT {
+        bigint closeout_sk PK
+        decimal checklist_completion_pct
+        boolean has_open_udo_flag
+    }
+    FACT_AWARD_LIFECYCLE }o--|| DIM_ACQUISITION : "originated from"
+    FACT_AWARD_LIFECYCLE }o--o| DIM_SOLICITATION : "competed via"
+    FACT_AWARD_LIFECYCLE }o--|| DIM_CONTRACTOR : "awarded to"
+    FACT_AWARD_LIFECYCLE }o--o| DIM_CLOSEOUT : "closed out via"
+    DIM_SOLICITATION }o--|| DIM_ACQUISITION : "issued under"
+</div></div>
+<div class="card">
+  <h3>Key Lifecycle Metrics — fact_award_lifecycle</h3>
+  <table class="col-tbl">
+    <tr><th>Metric</th><th>Type</th><th>Formula / Source</th><th>Business Use</th></tr>
+    <tr><td><span class="cn">days_in_pre_award</span> <span class="gen-badge">DERIVED</span></td><td>INT</td><td>award_effective_dt − requirements_received_dt</td><td class="cn2">Acquisition cycle time — GAO High Risk KPI</td></tr>
+    <tr><td><span class="cn">days_to_pop_end</span> <span class="gen-badge">DERIVED</span></td><td>INT</td><td>award_pop_end_dt − CURRENT_DATE</td><td class="cn2">PoP remaining (negative = past PoP)</td></tr>
+    <tr><td><span class="cn">current_udo_amt</span></td><td>DECIMAL(15,2)</td><td>current_obligated − current_accepted</td><td class="cn2">UDO snapshot for lifecycle view</td></tr>
+    <tr><td><span class="cn">accrual_holdback_amt</span></td><td>DECIMAL(15,2)</td><td>FSD holdback from DP4 accrual</td><td class="cn2">Holdback summary for lifecycle overview</td></tr>
+    <tr><td><span class="cn">checklist_completion_pct</span></td><td>DECIMAL(5,2)</td><td>completed_items / total_items × 100</td><td class="cn2">Closeout checklist % per FAR 4.804</td></tr>
+  </table>
+</div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (12)</h4>
+    <div class="src-list">
+      <div class="src-item" title="Pre-award planning — dim_acquisition grain"><span class="src-dot" style="background:#c9a227;"></span>aasbs.acquisition</div>
+      <div class="src-item" title="IGCE, competition type, performance type"><span class="src-dot" style="background:#c9a227;"></span>aasbs.acquisition_plan</div>
+      <div class="src-item" title="Solicitation record — dim_solicitation"><span class="src-dot" style="background:#c9a227;"></span>aasbs.solicit</div>
+      <div class="src-item" title="Solicitation amendment count"><span class="src-dot" style="background:#c9a227;"></span>aasbs.solicit_amendment</div>
+      <div class="src-item" title="Award header — shared with DP1"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.award</div>
+      <div class="src-item" title="Modification history and lifecycle dates"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.award_mod</div>
+      <div class="src-item" title="Contractor UEI/DUNS per mod"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.award_mod_company</div>
+      <div class="src-item" title="Closeout header — dim_closeout grain"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.acquisition_closeout</div>
+      <div class="src-item" title="Checklist items — completion_pct aggregation"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.acquisition_closeout_checklist</div>
+      <div class="src-item" title="Invoice dates for lifecycle timing"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.invoice</div>
+      <div class="src-item" title="CLIN/SLIN — shared dim_line_item with DP1"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.line_item</div>
+      <div class="src-item" title="Obligation amounts for current_obligated_amt"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.loa_ledger</div>
+    </div>
+</div><!-- /#detail-dp2 -->
+
+<!-- ─── DP3 Detail ──────────────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp3" data-phase="award" data-schema="fre">
+<div class="section-hdr">
+  <div class="icon" style="background:#fff3e0;color:var(--dp3);">📡</div>
+  <div><h2 style="color:var(--dp3);">DP3 · FPDS-NG Reporting Extract</h2>
+  <div class="sub">assist_catalog.fre · Award Modification grain · FPDS-NG / USASpending downstream</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#fff3e0;color:var(--dp3);border:1px solid #f0c090;white-space:nowrap;">FAR 4.604 · FFATA · DATA Act DAIMS v2.0</span>
+</div>
+<div class="schema-box">
+  <h4>Schema Topology — assist_catalog.fre</h4>
+  <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_fpds_transaction</span><span class="tdesc">— One row per award mod = one FPDS CAR. CDF enabled for near-real-time feed.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_fpds_award</span><span class="tdesc">— Base award: instrument type, IDV reference, competition, SBA program.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_fpds_contractor</span><span class="tdesc">— Contractor UEI, DUNS, business type per mod. SCD2.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_fpds_agency</span><span class="tdesc">— Contracting + funding agency/bureau + place of performance.</span></div>
+  <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_fpds_psc</span><span class="tdesc">— Product Service Code taxonomy (DoD PSC Manual, SAM.gov).</span></div>
+  <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_date</span><span class="tdesc">— Shared from DP1.</span></div>
+  <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_agency</span><span class="tdesc">— Shared from DP1.</span></div>
+  <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_fpds_submission_queue</span><span class="tdesc">— Pending/error CARs with FAR 4.604(b) 3-day deadline tracking.</span></div>
+  <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_fpds_usaspending_extract</span><span class="tdesc">— Column names aligned to DATA Act DAIMS v2.0 for API push.</span></div>
+  <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_fpds_obligation_by_agency</span><span class="tdesc">— OMB MAX / congressional: obligation by agency/FY/business type.</span></div>
+</div>
+<div class="erd-wrap"><h4>Entity Relationship Diagram — DP3 (Crow's Foot Notation)</h4>
+<div class="mermaid">
+erDiagram
+    FACT_FPDS_TRANSACTION {
+        bigint fpds_transaction_sk PK
+        bigint fpds_award_sk
+        bigint fpds_contractor_sk
+        bigint fpds_agency_sk
+        bigint fpds_psc_sk
+        string award_piid
+        string mod_num
+        decimal action_obligation_amt
+        string fpds_car_status_cd
+        string treasury_account_symbol
+    }
+    DIM_FPDS_AWARD {
+        bigint fpds_award_sk PK
+        string award_piid
+        string instrument_type_cd
+        string idv_piid
+    }
+    DIM_FPDS_CONTRACTOR {
+        bigint fpds_contractor_sk PK
+        string uei
+        string contractor_name
+        boolean is_current_flag
+    }
+    DIM_FPDS_AGENCY {
+        bigint fpds_agency_sk PK
+        string contracting_office_aac
+        string funding_agency_cd
+    }
+    DIM_FPDS_PSC {
+        bigint fpds_psc_sk PK
+        string psc_cd
+        string psc_description
+    }
+    FACT_FPDS_TRANSACTION }o--|| DIM_FPDS_AWARD : "reports on"
+    FACT_FPDS_TRANSACTION }o--|| DIM_FPDS_CONTRACTOR : "awarded to"
+    FACT_FPDS_TRANSACTION }o--|| DIM_FPDS_AGENCY : "contracted by"
+    FACT_FPDS_TRANSACTION }o--o| DIM_FPDS_PSC : "PSC code"
+</div></div>
+<div class="card">
+  <h3>FPDS CAR Submission Tracking — v_fpds_submission_queue</h3>
+  <p style="margin-bottom:.8rem;">Enforces the <strong>FAR 4.604(b) 3 business-day rule</strong> by flagging PENDING transactions where mod_effective_dt is more than 3 calendar days ago.</p>
+  <table class="col-tbl">
+    <tr><th>Status</th><th>Condition</th><th>Action Required</th></tr>
+    <tr><td><strong>IN_QUEUE</strong></td><td>PENDING, within 3 days</td><td class="cn2">Normal — awaiting next transmission</td></tr>
+    <tr><td><strong style="color:var(--orange);">OVERDUE</strong></td><td>PENDING, &gt; 3 days old</td><td class="cn2">Escalate to CO — FAR 4.604(b) breach</td></tr>
+    <tr><td><strong style="color:var(--red);">ACTION_REQUIRED</strong></td><td>ERROR status</td><td class="cn2">FPDS validation error — correct and resubmit</td></tr>
+    <tr><td><strong style="color:var(--green);">ACCEPTED</strong></td><td>fpds_accepted_dt populated</td><td class="cn2">Complete — visible on USASpending.gov</td></tr>
+  </table>
+</div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (17)</h4>
+    <div class="src-list">
+      <div class="src-item" title="One mod = one FPDS CAR — fact grain"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.award_mod</div>
+      <div class="src-item" title="Pre-computed mod amounts: action/base/exercised"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.snap_award_mod_amts</div>
+      <div class="src-item" title="Base award: instrument type, IDV ref, competition"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.award</div>
+      <div class="src-item" title="Contractor UEI/DUNS per mod — dim_fpds_contractor"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.award_mod_company</div>
+      <div class="src-item" title="Competition type, commercial type flags"><span class="src-dot" style="background:#c9a227;"></span>aasbs.acquisition</div>
+      <div class="src-item" title="NAICS codes for FPDS reporting"><span class="src-dot" style="background:#c9a227;"></span>aasbs.acquisition_naics</div>
+      <div class="src-item" title="Treasury Account Symbol, object class code"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.loa</div>
+      <div class="src-item" title="action_obligation_amt via line_item_accepted bridge"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.loa_ledger</div>
+      <div class="src-item" title="Bridge: loa_ledger to award_mod join"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.line_item_accepted</div>
+      <div class="src-item" title="IA instrument type and fiscal year"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.ia</div>
+      <div class="src-item" title="Place of performance state/country"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.place_of_performance</div>
+      <div class="src-item" title="FPDS CAR transmission status cross-check"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.transmittal</div>
+      <div class="src-item" title="Transmittal envelope routing per AAC"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.transmittal_envelope</div>
+      <div class="src-item" title="Product Service Code taxonomy — dim_fpds_psc"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lus_psc</div>
+      <div class="src-item" title="Contracting + funding agency — dim_fpds_agency"><span class="src-dot" style="background:#6b7a99;"></span>table_master.lu_federal_agency</div>
+      <div class="src-item" title="FPDS CAR status decode (DP11 ref)"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_fpds_car_status</div>
+      <div class="src-item" title="SF-30 mod type codes A to S (DP11 ref)"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_sf30_mod_type</div>
+    </div>
+</div><!-- /#detail-dp3 -->
+
+<!-- ─── DP4 Detail ──────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp4" data-phase="post-award" data-schema="air">
+<div class="section-hdr">
+  <div class="icon" style="background:#edf7f1;color:#2a7d4f;">📈</div>
+  <div><h2 style="color:#2a7d4f;">DP4 · Accrual Income &amp; GSA Revenue Tracker</h2>
+  <div class="sub">assist_catalog.air · CLIN × LOA × month grain · CFO + BAAR consumer</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#edf7f1;color:#2a7d4f;border:1px solid #a0d9c8;white-space:nowrap;">FASAB SFFAS 7 · OMB A-136 · BAAR</span>
+</div>
+<div class="dp-detail-card">
+  <div class="dc-header" style="border-color:#2a7d4f;background:#edf7f1;">
+    <div class="dc-num" style="color:#2a7d4f;">DATA PRODUCT 4</div>
+    <h3>Accrual Income &amp; GSA Revenue Tracker</h3>
+  </div>
+  <div class="dc-body">
+    <div class="dc-two-col">
+      <div class="info-box">
+        <h4>Why This Product Matters</h4>
+        <p>DP1 tracks expenses (what GSA spends on contractors). DP4 tracks income (what client agencies owe GSA for services). Without DP4, the CFO cannot produce a complete P&amp;L or balance sheet for the revolving fund. Income recognition at USSGL 5000-level is mandated by FASAB SFFAS 7 (Revenue). LOA-level distribution enables attribution of revenue back to individual Treasury accounts. DP4 also enriches DP1&#39;s accrued_amt column via the CDC pipeline — creating the only bidirectional dependency in the architecture.</p>
+      </div>
+      <div class="info-box">
+        <h4>Primary Consumers</h4>
+        <div class="consumer-pills"><span class="cpill">CFO / Revenue Accountants</span><span class="cpill">BAAR System (Treasury)</span><span class="cpill">Financial Statement Preparers</span><span class="cpill">Internal Audit</span><span class="cpill">OMB MAX A-136 Reporters</span></div>
+        <h4 style="margin-top:.7rem;">Regulatory Basis</h4>
+        <p style="font-size:.78rem;">FASAB SFFAS 7 (Revenue Recognition) · OMB Circular A-136 · USSGL 5100–5900 · BAAR transmission specs</p>
+      </div>
+    </div>
+    <div class="schema-box">
+      <h4>Schema Topology — assist_catalog.air</h4>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_accrual_income</span><span class="tdesc">— One row per accrual_income_dist — CLIN × LOA × period. INSERT-only guard.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_accrual_period</span><span class="tdesc">— Generated federal fiscal calendar spine Oct 2000–Sep 2035. No Silver dependency.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_onefund_program</span><span class="tdesc">— AAC-grained OneFund mapping with BAAR doc type. SCD1.</span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_line_item</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_loa</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_ia</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_agency</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_revenue_vs_expense</span><span class="tdesc">— DP1 vs DP4 income/expense reconciliation per CLIN/LOA.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_baar_transmission_status</span><span class="tdesc">— BAAR batch status by period — transmitted, accepted, rejected.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_accrual_holdback_overrides</span><span class="tdesc">— FSD holdback override tracking with audit trail.</span></div>
+    </div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (16)</h4>
+    <div class="src-list">
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.accrual_income</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.accrual_income_dist</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.accrual_expense</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>accrual.accrual_batch</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>accrual.accrual_header</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>accrual.accrual_income_line</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.accrual_income_header</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.accrual_income_acct_line</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.map_aac_onefund</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.map_onefund_program_accrual_income_doc_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_onefund_program</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_onefund_activity</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_accrual_income_doc_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.accrual_income_dist_summary</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>accrual.accrual_response_header</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>accrual.accrual_response_detail</div>
+    </div>
+  </div>
+</div>
+</div><!-- /#detail-dp4 -->
+
+<!-- ─── DP5 Detail ──────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp5" data-phase="post-award" data-schema="tpp">
+<div class="section-hdr">
+  <div class="icon" style="background:#edf7f1;color:#155d3e;">🏦</div>
+  <div><h2 style="color:#155d3e;">DP5 · Treasury Transmission &amp; Payment Pipeline</h2>
+  <div class="sub">assist_catalog.tpp · transmittal grain · Treasury + Pegasys consumer</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#edf7f1;color:#155d3e;border:1px solid #a0d9c8;white-space:nowrap;">Prompt Payment Act · TFM Vol I Pt 2</span>
+</div>
+<div class="dp-detail-card">
+  <div class="dc-header" style="border-color:#155d3e;background:#edf7f1;">
+    <div class="dc-num" style="color:#155d3e;">DATA PRODUCT 5</div>
+    <h3>Treasury Transmission &amp; Payment Pipeline</h3>
+  </div>
+  <div class="dc-body">
+    <div class="dc-two-col">
+      <div class="info-box">
+        <h4>Why This Product Matters</h4>
+        <p>Every invoice processed in ASSIST must be transmitted to Pegasys for payment. Pegasys returns a receiving report (RR) confirming delivery, and VITAP processes the final disbursement. Transmit errors, suspension windows, and reconciliation gaps between bill_item amounts and transmitted amounts are major audit findings. The Prompt Payment Act (31 U.S.C. §3901) requires payment within 30 days — this product enables SLA monitoring per invoice across all Treasury-bound transmissions.</p>
+      </div>
+      <div class="info-box">
+        <h4>Primary Consumers</h4>
+        <div class="consumer-pills"><span class="cpill">Treasury / Pegasys Operators</span><span class="cpill">Financial Systems Team</span><span class="cpill">CFO Payment Operations</span><span class="cpill">OIG / Payment Auditors</span><span class="cpill">IPAC Reconciliation Team</span></div>
+        <h4 style="margin-top:.7rem;">Regulatory Basis</h4>
+        <p style="font-size:.78rem;">Prompt Payment Act (31 U.S.C. §3901) · IPAC (Intra-Governmental Payment and Collection) · OMB A-123 Appendix C · TFM Volume I Part 2</p>
+      </div>
+    </div>
+    <div class="schema-box">
+      <h4>Schema Topology — assist_catalog.tpp</h4>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_transmission_event</span><span class="tdesc">— One row per transmittal envelope. Tracks status through Pegasys lifecycle.</span></div>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_payment_reconciliation</span><span class="tdesc">— PO → billing → receiving report → disbursement reconciliation.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_transmittal_type</span><span class="tdesc">— Transmittal type codes: BILLING, PO, RR, ACCRUAL, IPAC.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_aac_envelope</span><span class="tdesc">— AAC-level envelope routing configuration.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_agreement</span><span class="tdesc">— Agreement/contract reference for IPAC routing.</span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_agency</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_date</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_loa</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_transmit_error_log</span><span class="tdesc">— All transmission errors with error codes and retry history.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_prompt_payment_sla</span><span class="tdesc">— Invoice age from receipt to payment — Prompt Payment Act dashboard.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_billing_vs_transmitted</span><span class="tdesc">— Reconciliation: bill_item amounts vs. transmitted amounts.</span></div>
+    </div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (23)</h4>
+    <div class="src-list">
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.billing_summary</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.inv_detail</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.inv_summary</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.po_accounting</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.po_line</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.rr_detail</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.rr_summary</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.transmittal_envelope</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.transmittal_suspension</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.transmit_error</div>
+      <div class="src-item"><span class="src-dot" style="background:#455a8a;"></span>aasbs_transmit.aac_envelope</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>billing.billing</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>billing.billing_summary</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>billing.bill_item</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.payment</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.disbursement</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.receiving_report</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.purchase_order</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs_transmit.transmittal_spec_version</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs_transmit.transmittal_specification</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs_transmit.transmittal_poc</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.ipac_transaction</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.vitap_batch</div>
+    </div>
+  </div>
+</div>
+</div><!-- /#detail-dp5 -->
+
+<!-- ─── DP6 Detail ──────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp6" data-phase="award post-award" data-schema="psc">
+<div class="section-hdr">
+  <div class="icon" style="background:#f3eeff;color:#5e3c8f;">💲</div>
+  <div><h2 style="color:#5e3c8f;">DP6 · CLIN Pricing &amp; Service Charge Catalog</h2>
+  <div class="sub">assist_catalog.psc · billing schedule grain · FMAs + Price Analysts consumer</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#f3eeff;color:#5e3c8f;border:1px solid #d0b8f0;white-space:nowrap;">FAR 15.404 · FAR 52.232-7</span>
+</div>
+<div class="dp-detail-card">
+  <div class="dc-header" style="border-color:#5e3c8f;background:#f3eeff;">
+    <div class="dc-num" style="color:#5e3c8f;">DATA PRODUCT 6</div>
+    <h3>CLIN Pricing &amp; Service Charge Catalog</h3>
+  </div>
+  <div class="dc-body">
+    <div class="dc-two-col">
+      <div class="info-box">
+        <h4>Why This Product Matters</h4>
+        <p>DP1 knows how much was obligated and expended at CLIN level. DP6 reveals the structure of that pricing — is this a Labor CLIN with 10 labor categories? A Fixed Fee schedule with quarterly billing? A Travel CLIN with voucher actuals? This enables cost rate variance analysis (planned labor rate vs. actual), billing schedule adherence monitoring, and award fee performance tracking. Feeds should-cost models and price reasonableness for recompetes.</p>
+      </div>
+      <div class="info-box">
+        <h4>Primary Consumers</h4>
+        <div class="consumer-pills"><span class="cpill">Financial Management Analysts</span><span class="cpill">Cost/Price Analysts (FAR 15.404)</span><span class="cpill">Program Managers</span><span class="cpill">Billing Operations Team</span></div>
+        <h4 style="margin-top:.7rem;">Regulatory Basis</h4>
+        <p style="font-size:.78rem;">FAR 15.404 (Price Reasonableness) · FAR 52.232-7 (T&amp;M payments) · DCAA audit guidelines for labor billing</p>
+      </div>
+    </div>
+    <div class="schema-box">
+      <h4>Schema Topology — assist_catalog.psc</h4>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_billing_schedule</span><span class="tdesc">— One row per billing period per CLIN. Planned vs actual billing amounts.</span></div>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_labor_rate</span><span class="tdesc">— Labor category × rate × period. Planned rate vs. invoiced rate comparison.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_clin_subtype</span><span class="tdesc">— CLIN pricing type: FFP, T&amp;M, LH, CPFF, CPAF, Award Fee, ODC, Travel.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_labor_category</span><span class="tdesc">— Labor category hierarchy: discipline, level, classification.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_service_charge_schedule</span><span class="tdesc">— Service charge fee schedule per CLIN type and period.</span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_line_item</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_award</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_billing_schedule_health</span><span class="tdesc">— Billing schedule adherence: on-time, early, late by CLIN.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_labor_rate_variance</span><span class="tdesc">— Planned vs. actual labor rates by category and period.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_award_fee_pool</span><span class="tdesc">— Award fee available, earned, and unearned by evaluation period.</span></div>
+    </div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (14)</h4>
+    <div class="src-list">
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.li_award_deliv</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.li_ia_sc_labor</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.li_ia_sc_ff</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.li_ia_sc_odc</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.li_ia_sc_travel</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.li_ia_sc_award_fee</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.service_charge</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.service_charge_labor_cat</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.service_charge_schedule</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.award_fee_plan</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.award_fee_eval</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.labor_category</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>billing.bill_item</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_line_item_type</div>
+    </div>
+  </div>
+</div>
+</div><!-- /#detail-dp6 -->
+
+<!-- ─── DP7 Detail ──────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp7" data-phase="pre-award" data-schema="smi">
+<div class="section-hdr">
+  <div class="icon" style="background:#fff8e8;color:#c9a227;">🔍</div>
+  <div><h2 style="color:#c9a227;">DP7 · Solicitation &amp; Market Intelligence</h2>
+  <div class="sub">assist_catalog.smi · solicit_response grain · COs + Price Analysts consumer</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#fff8e8;color:#a06000;border:1px solid #f0d090;white-space:nowrap;">FAR Part 15 · FAR Part 19 · CICA</span>
+</div>
+<div class="dp-detail-card">
+  <div class="dc-header" style="border-color:#c9a227;background:#fff8e8;">
+    <div class="dc-num" style="color:#c9a227;">DATA PRODUCT 7</div>
+    <h3>Solicitation &amp; Market Intelligence</h3>
+  </div>
+  <div class="dc-body">
+    <div class="dc-two-col">
+      <div class="info-box">
+        <h4>Why This Product Matters</h4>
+        <p>Current DPs capture what was awarded. DP7 captures what was competed — including losing bids. This is the basis for price reasonableness determinations (FAR 15.404), analysis of how many vendors actually compete on each vehicle, and whether direct-connect vs. open postings yield different bid counts. The solicit_response table contains losing bid amounts, critical for should-cost benchmarking in future acquisitions.</p>
+      </div>
+      <div class="info-box">
+        <h4>Primary Consumers</h4>
+        <div class="consumer-pills"><span class="cpill">Contracting Officers</span><span class="cpill">Cost/Price Analysts</span><span class="cpill">Small Business Program Office</span><span class="cpill">Market Research Teams</span><span class="cpill">OIG / Competition Reviews</span></div>
+        <h4 style="margin-top:.7rem;">Regulatory Basis</h4>
+        <p style="font-size:.78rem;">FAR 15.404 (Price Reasonableness) · FAR Part 19 (Small Business) · CICA (Competition in Contracting Act) · FAR Part 10 (Market Research)</p>
+      </div>
+    </div>
+    <div class="schema-box">
+      <h4>Schema Topology — assist_catalog.smi</h4>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_solicit_response</span><span class="tdesc">— One row per contractor response per solicitation. Includes non-winning responses.</span></div>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_market_price</span><span class="tdesc">— Price benchmarks: award prices by PSC/NAICS/vehicle for market analysis.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_solicitation_detail</span><span class="tdesc">— Solicitation type, posting method, evaluation criteria, set-aside type.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_response_vendor</span><span class="tdesc">— Responding vendor: UEI, business type, small business certification.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_vehicle</span><span class="tdesc">— Contract vehicle used: GWACs, BPAs, IDIQs referenced in solicitation.</span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_agency</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_date</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_competition_health</span><span class="tdesc">— Competition rate by vehicle, PSC, set-aside type, FY.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_small_business_attainment</span><span class="tdesc">— SB goals vs. actuals by agency and program.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_price_benchmark</span><span class="tdesc">— Award prices vs. IGCE vs. losing bids per PSC/NAICS.</span></div>
+    </div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (13)</h4>
+    <div class="src-list">
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.solicit</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.solicit_amendment</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.solicit_response</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.solicit_response_detail</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.solicit_evaluation_criteria</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.acquisition</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.acquisition_plan</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.acquisition_naics</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.acquisition_psc</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_competition_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_solicitation_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_set_aside_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_posting_type</div>
+    </div>
+  </div>
+</div>
+</div><!-- /#detail-dp7 -->
+
+<!-- ─── DP8 Detail ──────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp8" data-phase="cross-cutting" data-schema="wpr">
+<div class="section-hdr">
+  <div class="icon" style="background:#fff3e0;color:#a04010;">👥</div>
+  <div><h2 style="color:#a04010;">DP8 · Workforce &amp; Personnel Registry</h2>
+  <div class="sub">assist_catalog.wpr · role_assignment grain · HR + Management consumer</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#fff3e0;color:#a04010;border:1px solid #f0c090;white-space:nowrap;">FAR 1.602-2 · COR Delegation</span>
+</div>
+<div class="dp-detail-card">
+  <div class="dc-header" style="border-color:#a04010;background:#fff3e0;">
+    <div class="dc-num" style="color:#a04010;">DATA PRODUCT 8</div>
+    <h3>Workforce &amp; Personnel Registry</h3>
+  </div>
+  <div class="dc-body">
+    <div class="dc-two-col">
+      <div class="info-box">
+        <h4>Why This Product Matters</h4>
+        <p>Who owns every contract action in ASSIST is buried across five separate user/role tables in the source schema. DP8 surfaces this as a clean role assignment fact — enabling workload analysis (how many active awards does each CO own?), COR delegation compliance (FAR 1.602-2 requires formal written delegation), and succession planning when contracting staff change. Also tracks client representative assignments — critical for OCONUS mission support.</p>
+      </div>
+      <div class="info-box">
+        <h4>Primary Consumers</h4>
+        <div class="consumer-pills"><span class="cpill">HR / Workforce Planning</span><span class="cpill">Regional Directors</span><span class="cpill">CO Supervisors</span><span class="cpill">COR Program Office</span><span class="cpill">Client Relationship Managers</span></div>
+        <h4 style="margin-top:.7rem;">Regulatory Basis</h4>
+        <p style="font-size:.78rem;">FAR 1.602-2 (COR Delegation Requirements) · FAR 1.602-1 (CO Warrant Authority) · OMB Memorandum M-09-25 (COR Training)</p>
+      </div>
+    </div>
+    <div class="schema-box">
+      <h4>Schema Topology — assist_catalog.wpr</h4>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_role_assignment</span><span class="tdesc">— One row per user × entity × role. Tracks all active and historical role assignments.</span></div>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_workload_snapshot</span><span class="tdesc">— Monthly workload snapshot per CO/COR: active awards, obligation value, PoP status.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_user</span><span class="tdesc">— ASSIST user with GSA employee profile, office, region, warrant level.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_role</span><span class="tdesc">— Role type: CO, COR, FMA, PM, CO_SPECIALIST, CLIENT_REP, SUPERVISOR.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_user_org</span><span class="tdesc">— Organizational unit hierarchy: region → division → branch.</span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_award</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_ia</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_agency</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_co_workload</span><span class="tdesc">— Active awards per CO with total obligation, PoP countdown, UDO balance.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_cor_delegation_compliance</span><span class="tdesc">— COR assignments with delegation letter status per FAR 1.602-2.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_office_coverage</span><span class="tdesc">— Awards without active CO or COR assignment — coverage gap report.</span></div>
+    </div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (14)</h4>
+    <div class="src-list">
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>assist.users</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>assist.user_profile</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.acquisition_role</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.award_role</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.ia_role</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.funding_role</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.solicit_role</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.user_delegation</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.warrant</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.warrant_history</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_role_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_warrant_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>assist.organization</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>assist.office</div>
+    </div>
+  </div>
+</div>
+</div><!-- /#detail-dp8 -->
+
+<!-- ─── DP9 Detail ──────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp9" data-phase="pre-award award" data-schema="iat">
+<div class="section-hdr">
+  <div class="icon" style="background:#edf2fc;color:#0a4d8c;">🤝</div>
+  <div><h2 style="color:#0a4d8c;">DP9 · IA Lifecycle &amp; Amendment Tracker</h2>
+  <div class="sub">assist_catalog.iat · ia_amendment grain · IA Program Managers consumer</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#edf2fc;color:#0a4d8c;border:1px solid #c0d2f0;white-space:nowrap;">FAR Part 17.5 · OMB A-123</span>
+</div>
+<div class="dp-detail-card">
+  <div class="dc-header" style="border-color:#0a4d8c;background:#edf2fc;">
+    <div class="dc-num" style="color:#0a4d8c;">DATA PRODUCT 9</div>
+    <h3>IA Lifecycle &amp; Amendment Tracker</h3>
+  </div>
+  <div class="dc-body">
+    <div class="dc-two-col">
+      <div class="info-box">
+        <h4>Why This Product Matters</h4>
+        <p>The main IA table in DP1 is point-in-time — it holds the current state. DP9 adds the full version history: every time an IA was amended to change scope, adjust costs, or extend the period. ia_review captures annual reviews required by OMB A-123; tracking completion rates reveals governance risk. award_fin_log contains every historical FIN code for financial routing — essential when financial management transfers between offices.</p>
+      </div>
+      <div class="info-box">
+        <h4>Primary Consumers</h4>
+        <div class="consumer-pills"><span class="cpill">IA Program Managers</span><span class="cpill">Inter-Agency Agreement Officers</span><span class="cpill">CFO Financial Analysts</span><span class="cpill">Audit / OIG Review Teams</span></div>
+        <h4 style="margin-top:.7rem;">Regulatory Basis</h4>
+        <p style="font-size:.78rem;">FAR Part 17.5 (Interagency Acquisitions) · OMB A-123 (Internal Controls) · Economy Act (31 U.S.C. §1535) · FSIO IIAF v2.0</p>
+      </div>
+    </div>
+    <div class="schema-box">
+      <h4>Schema Topology — assist_catalog.iat</h4>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_ia_amendment</span><span class="tdesc">— One row per IA amendment. Scope delta, cost delta, period extension per event.</span></div>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_ia_review</span><span class="tdesc">— Annual OMB A-123 review records per IA with completion status.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_ia_version</span><span class="tdesc">— SCD2 IA history: every version of IA attributes across amendments.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_fin_code_history</span><span class="tdesc">— FIN code change log — financial routing history per award.</span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_ia</span><span class="tdesc">— Shared from DP1 — current IA state. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_funding</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_agency</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_ia_health_score</span><span class="tdesc">— IA health: days to expiry, amendment frequency, review compliance.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_ia_renewal_pipeline</span><span class="tdesc">— IAs expiring within 90/180/365 days with renewal risk flags.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_funding_amendment_detail</span><span class="tdesc">— Incremental funding tranches per LOA per amendment.</span></div>
+    </div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (10)</h4>
+    <div class="src-list">
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.ia</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.ia_amendment</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.ia_review</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.funding_amendment</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.funding_amendment_loa</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.award_fin_log</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.ia_scope_change</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.ia_cost_adjustment</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_ia_amendment_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_ia_review_type</div>
+    </div>
+  </div>
+</div>
+</div><!-- /#detail-dp9 -->
+
+<!-- ─── DP10 Detail ──────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp10" data-phase="cross-cutting" data-schema="cat">
+<div class="section-hdr">
+  <div class="icon" style="background:#fff0f0;color:#b03030;">📝</div>
+  <div><h2 style="color:#b03030;">DP10 · Collaboration, Review &amp; Audit Trail</h2>
+  <div class="sub">assist_catalog.cat · chronology_event grain · OIG + Compliance consumer</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#fff0f0;color:#b03030;border:1px solid #f0a0a0;white-space:nowrap;">OMB A-123 · Inspector General Act</span>
+</div>
+<div class="dp-detail-card">
+  <div class="dc-header" style="border-color:#b03030;background:#fff0f0;">
+    <div class="dc-num" style="color:#b03030;">DATA PRODUCT 10</div>
+    <h3>Collaboration, Review &amp; Audit Trail</h3>
+  </div>
+  <div class="dc-body">
+    <div class="dc-two-col">
+      <div class="info-box">
+        <h4>Why This Product Matters</h4>
+        <p>ASSIST records every significant lifecycle event in the chronology and central_collab tables, but these are buried in the operational schema and not queryable for audit purposes. DP10 surfaces the complete decision history — pre-award reviews, collaboration requests, pricing review outcomes, and all comment threads — as a queryable Gold product. OIG document requests are typically fulfilled within 24 hours when DP10 is available; without it, analysts must query Silver directly.</p>
+      </div>
+      <div class="info-box">
+        <h4>Primary Consumers</h4>
+        <div class="consumer-pills"><span class="cpill">OIG / Audit Response Teams</span><span class="cpill">Compliance / Ethics Office</span><span class="cpill">Pre-Award Review Officers</span><span class="cpill">Process Improvement Analysts</span><span class="cpill">Legal Counsel</span></div>
+        <h4 style="margin-top:.7rem;">Regulatory Basis</h4>
+        <p style="font-size:.78rem;">Inspector General Act (5 U.S.C. App. 3) · OMB A-123 (Management Accountability) · FAR 15.403-1 (Certified Cost/Price Data) · Federal Records Act</p>
+      </div>
+    </div>
+    <div class="schema-box">
+      <h4>Schema Topology — assist_catalog.cat</h4>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_lifecycle_event</span><span class="tdesc">— One row per chronology event. Complete event log across all entities.</span></div>
+      <div class="table-row"><span class="tt fact">FACT</span><span class="tname">fact_collaboration_request</span><span class="tdesc">— Pre-award review requests with outcome, reviewer, and disposition.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_event_type</span><span class="tdesc">— Event type taxonomy: AWARD_MOD, IA_AMENDMENT, REVIEW_REQUESTED, etc.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_reviewer</span><span class="tdesc">— Reviewer profile: name, office, role, delegation authority.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">dim_comment_thread</span><span class="tdesc">— Collaboration thread with parent entity reference and resolution status.</span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_award</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_ia</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_agency</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row shared-ref"><span class="tt dim">DIM</span><span class="tname">common.dim_date</span><span class="tdesc">— Shared from DP1. </span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_pre_award_review_outcomes</span><span class="tdesc">— Legal/technical/price review disposition rates by office and FY.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">v_entity_audit_trail</span><span class="tdesc">— Complete chronology for any award/IA — OIG document fulfillment view.</span></div>
+    </div>
+    <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (11)</h4>
+    <div class="src-list">
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.central_collab</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.central_collab_request</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.central_collab_comment</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.central_collab_attachment</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.chronology</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.chronology_event</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.workflow</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.workflow_state</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.notification</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_chronology_event_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_collab_request_type</div>
+    </div>
+  </div>
+</div>
+</div><!-- /#detail-dp10 -->
+
+<!-- ─── DP11 Detail ──────────────────────────────────────────────── -->
+<div class="detail-dp" id="detail-dp11" data-phase="cross-cutting" data-schema="ref">
+<div class="section-hdr">
+  <div class="icon" style="background:#f0f3f9;color:#6b7a99;">📚</div>
+  <div><h2 style="color:#6b7a99;">DP11 · Conformed Reference Data Catalog</h2>
+  <div class="sub">assist_catalog.ref · lookup code grain · All data products consumer</div></div>
+  <span style="margin-left:auto;font-size:.75rem;font-weight:700;padding:.2rem .75rem;border-radius:20px;background:#f0f3f9;color:#6b7a99;border:1px solid #dce3ef;white-space:nowrap;">All DPs · Self-Service Decodes</span>
+</div>
+<div class="dp-detail-card">
+  <div class="dc-header" style="border-color:#6b7a99;background:#f0f3f9;">
+    <div class="dc-num" style="color:#6b7a99;">DATA PRODUCT 11</div>
+    <h3>Conformed Reference Data Catalog</h3>
+  </div>
+  <div class="dc-body">
+    <div class="dc-two-col">
+      <div class="info-box">
+        <h4>Why This Product Matters</h4>
+        <p>Sixty-one lookup tables in the aasbs and aasbs_transmit schemas provide code descriptions for every status code, type code, and category code in the system. Without a conformed reference product, each data product must join back to these tables independently — creating maintenance burden when lookup values change. DP11 publishes all lu_* tables as versioned Delta Lake tables with a unified schema (cd, description, domain, active_yn, eff_start_dt, eff_end_dt), enabling self-service decodes for any Gold consumer.</p>
+      </div>
+      <div class="info-box">
+        <h4>Primary Consumers</h4>
+        <div class="consumer-pills"><span class="cpill">All DP1–DP10 pipelines</span><span class="cpill">Business Intelligence / Tableau</span><span class="cpill">Ad hoc analysts</span><span class="cpill">API consumers requiring code descriptions</span></div>
+        <h4 style="margin-top:.7rem;">Regulatory Basis</h4>
+        <p style="font-size:.78rem;">N/A — Reference data product; no direct regulatory mandate. Supports compliance with data governance requirements.</p>
+      </div>
+    </div>
+    <div class="schema-box">
+      <h4>Schema Topology — assist_catalog.ref</h4>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_acquisition_status</span><span class="tdesc">— Acquisition status codes: PLANNING, IN_SOLICITATION, AWARDED, etc.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_award_status</span><span class="tdesc">— Award status codes: ACTIVE, CLOSED, CANCELLED, TERMINATED.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_modification_type</span><span class="tdesc">— Award mod type codes (SF-30 types A through S).</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_contract_type</span><span class="tdesc">— Contract type codes: FFP, T&amp;M, LH, CPFF, CPAF, IDIQ, BPA.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_loa_status</span><span class="tdesc">— LOA status codes: ACTIVE, EXPIRED, CANCELLED.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_fund_type</span><span class="tdesc">— Fund type codes: ANNUAL, MULTI_YEAR, NO_YEAR.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_billing_type</span><span class="tdesc">— Billing type codes: AD (Advance Deposit), RA (Reimbursable Agreement).</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_ia_type</span><span class="tdesc">— IA type codes: GTC, IAA, IOA, MOU, ECONOMY_ACT.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_solicitation_type</span><span class="tdesc">— Solicitation type: DIRECT_CONNECT, OPEN, INFORMAL, FORMAL.</span></div>
+      <div class="table-row"><span class="tt dim">DIM</span><span class="tname">ref.lu_* (53 more)</span><span class="tdesc">— All remaining aasbs and aasbs_transmit lookup tables.</span></div>
+      <div class="table-row"><span class="tt view">VIEW</span><span class="tname">ref.v_all_codes</span><span class="tdesc">— Union of all lookup domains — single searchable reference view.</span></div>
+    </div>
+        <h4 style="font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:.8rem 0 .5rem;">Source Tables (61)</h4>
+    <div class="src-list">
+      <div class="src-item" title="Fund code descriptions"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_fund</div>
+      <div class="src-item" title="Fund status: ACTIVE, CLOSED, CANCELLED"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_fund_status</div>
+      <div class="src-item" title="Fund type: ANNUAL, MULTI_YEAR, NO_YEAR"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_fund_type</div>
+      <div class="src-item" title="Fund category: DIRECT, REIMBURSABLE"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_fund_category</div>
+      <div class="src-item" title="Billing type: AD (Advance Deposit), RA (Reimb.)"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_billing_type</div>
+      <div class="src-item" title="LOA ledger transaction type codes"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_transaction_type</div>
+      <div class="src-item" title="LOA status codes"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_loa_status</div>
+      <div class="src-item" title="LOA change reason codes"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_loa_change_reason</div>
+      <div class="src-item" title="Funding amendment status codes"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_fund_amend_status</div>
+      <div class="src-item" title="Funds usage classification codes"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_funds_usage</div>
+      <div class="src-item" title="Contract type: FFP, T&amp;M, CPFF, CPAF, IDIQ"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_contract_type</div>
+      <div class="src-item" title="Award status: ACTIVE, CLOSED, TERMINATED"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_award_status</div>
+      <div class="src-item" title="FPDS reason for modification codes"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_award_mod_fpds_reason</div>
+      <div class="src-item" title="Contract vehicle type: GWAC, BPA, IDIQ"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_vehicle_type</div>
+      <div class="src-item" title="Instrument type: GTC, IAA, IOA, ECONOMY_ACT"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_instrument_type</div>
+      <div class="src-item" title="Contract continuity classification"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_continuity_type</div>
+      <div class="src-item" title="Bundled contract determination codes"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_bundled_contract</div>
+      <div class="src-item" title="Consolidated contract determination"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_consolidated_contract</div>
+      <div class="src-item" title="Commercial / non-commercial determination"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_commercial_type</div>
+      <div class="src-item" title="Acquisition status codes"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_acquisition_status</div>
+      <div class="src-item" title="Acquisition type: SERVICE, SUPPLY"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_acquisition_type</div>
+      <div class="src-item" title="Competition type per FAR Part 6"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_competition_type</div>
+      <div class="src-item" title="PBA / non-PBA performance type"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_performance_type</div>
+      <div class="src-item" title="Routine vs. Expedited processing"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_processing_speed</div>
+      <div class="src-item" title="Expedited processing cause codes"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_expedited_type</div>
+      <div class="src-item" title="FAR Part 18 emergency acquisition indicator"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_emergency_acq</div>
+      <div class="src-item" title="CMMC / supply chain risk codes"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_supply_chain_risk</div>
+      <div class="src-item" title="DD-254 security specification indicator"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_surveillance_spec</div>
+      <div class="src-item" title="Intelligence Community member indicator"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_intel_community</div>
+      <div class="src-item" title="SBA program: 8(a), HUBZone, SDVOSB"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_small_business_admin</div>
+      <div class="src-item" title="Direct connect reason codes"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_reason_for_direct</div>
+      <div class="src-item" title="Solicitation status codes"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_status</div>
+      <div class="src-item" title="Solicitation amendment status"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_amend_status</div>
+      <div class="src-item" title="Posting type: DIRECT_CONNECT, OPEN, FORMAL"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_posting_type</div>
+      <div class="src-item" title="Response AAC visibility codes"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_response_aac_visibility</div>
+      <div class="src-item" title="Response client visibility codes"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_response_cli_visibility</div>
+      <div class="src-item" title="CLIN type: Deliverable, SC, Travel, ODC"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_line_item_type</div>
+      <div class="src-item" title="CLIN severability: Severable, Nonseverable"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_severability_type</div>
+      <div class="src-item" title="Unit of measure codes"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_unit_of_measure</div>
+      <div class="src-item" title="Cost rate type for labor CLINs"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_cost_rate_type</div>
+      <div class="src-item" title="IA status: ACTIVE, EXPIRED, CANCELLED"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_ia_status</div>
+      <div class="src-item" title="IA amendment action codes"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_ia_amend_action</div>
+      <div class="src-item" title="GSA program codes: AAS, ITS_NSD, FAS"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_program</div>
+      <div class="src-item" title="BAAR accrual income document type"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_accrual_income_doc_type</div>
+      <div class="src-item" title="OneFund program codes and descriptions"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_onefund_program</div>
+      <div class="src-item" title="OneFund activity codes and descriptions"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_onefund_activity</div>
+      <div class="src-item" title="Collaboration request type codes"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_collab_type</div>
+      <div class="src-item" title="Collaboration status codes"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_collab_status</div>
+      <div class="src-item" title="Central comment type classification"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_central_comment_type</div>
+      <div class="src-item" title="Chronology event type codes"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_event_type</div>
+      <div class="src-item" title="Pre-award review type: Legal, Price, Tech"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_review_type</div>
+      <div class="src-item" title="Review finding / outcome codes"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_review_finding</div>
+      <div class="src-item" title="Reviewer role type codes"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_reviewer_type</div>
+      <div class="src-item" title="Role type: CO, COR, FMA, PM, CLIENT_REP"><span class="src-dot" style="background:#e07b27;"></span>aasbs.lu_responsible_role</div>
+      <div class="src-item" title="COR delegation method codes"><span class="src-dot" style="background:#e07b27;"></span>aasbs.lu_cor_delegation</div>
+      <div class="src-item" title="Closeout prohibition codes per FAR 4.804"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_closeout_prohibition</div>
+      <div class="src-item" title="Closeout checklist type codes"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_checklist_type</div>
+      <div class="src-item" title="Transmittal status codes"><span class="src-dot" style="background:#6b7a99;"></span>aasbs_transmit.lu_transmittal_status</div>
+      <div class="src-item" title="Transmittal record type codes"><span class="src-dot" style="background:#6b7a99;"></span>aasbs_transmit.lu_transmittal_record_type</div>
+      <div class="src-item" title="Transmittal processing stage codes"><span class="src-dot" style="background:#6b7a99;"></span>aasbs_transmit.lu_transmittal_stage</div>
+      <div class="src-item" title="Transmittal type: BILLING, PO, RR, ACCRUAL"><span class="src-dot" style="background:#6b7a99;"></span>aasbs_transmit.lu_transmittal_type</div>
+    </div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_fund_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_fund_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_fund_category</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_billing_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_transaction_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_loa_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_loa_change_reason</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_fund_amend_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_funds_usage</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_contract_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_award_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_sf30_mod_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_award_mod_fpds_reason</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_vehicle_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_instrument_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_continuity_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_bundled_contract</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_consolidated_contract</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_idv_type_of_idc</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_idv_referenced_class</div>
+      <div class="src-item"><span class="src-dot" style="background:#5e3c8f;"></span>aasbs.lu_idv_who_can_use</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_acquisition_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_acquisition_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_competition_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_commercial_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_performance_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_processing_speed</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_expedited_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_emergency_acq</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_supply_chain_risk</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_surveillance_spec</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_intel_community</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_reason_for_direct</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_small_business_admin</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_amend_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_posting_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_response_aac_visibility</div>
+      <div class="src-item"><span class="src-dot" style="background:#c9a227;"></span>aasbs.lu_sol_response_cli_visibility</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_line_item_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_severability_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_unit_of_measure</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_cost_rate_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_ia_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_ia_amend_action</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_program</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_accrual_income_doc_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_onefund_program</div>
+      <div class="src-item"><span class="src-dot" style="background:#1e5fa8;"></span>aasbs.lu_onefund_activity</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_fpds_car_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_collab_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_collab_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_central_comment_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_event_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_review_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_review_finding</div>
+      <div class="src-item"><span class="src-dot" style="background:#b03030;"></span>aasbs.lu_reviewer_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.lu_responsible_role</div>
+      <div class="src-item"><span class="src-dot" style="background:#e07b27;"></span>aasbs.lu_cor_delegation</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_closeout_prohibition</div>
+      <div class="src-item"><span class="src-dot" style="background:#6b7a99;"></span>aasbs.lu_checklist_type</div>
+    </div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_acquisition_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_competition_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_contract_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_award_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_mod_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_loa_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_fund_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_fund_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_billing_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_ia_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_ia_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_ia_amendment_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_solicitation_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_solicitation_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_set_aside_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_line_item_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_role_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_closeout_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_invoice_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_acceptance_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_transmission_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_accrual_income_doc_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_onefund_program</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs.lu_onefund_activity</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs_transmit.lu_transmit_status</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs_transmit.lu_error_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>aasbs_transmit.lu_batch_type</div>
+      <div class="src-item"><span class="src-dot" style="background:#9ba8c2;"></span>... 33 more lu_* tables</div>
+    </div>
+  </div>
+</div>
+</div><!-- /#detail-dp11 -->
+
+<!-- Lineage + Regulatory sections from original catalog -->
+<div class="detail-dp" id="detail-lineage" data-phase="pre-award award post-award cross-cutting" data-schema="oet alt fre air tpp psc smi wpr iat cat ref">
+<div class="section-hdr" style="margin-top:3rem;">
+  <div class="icon" style="background:#f3eeff;color:var(--purple);">🔗</div>
+  <div><h2>Source-to-Gold Data Lineage</h2><div class="sub">aasbs legacy schema → Databricks Unity Catalog Gold products</div></div>
+</div>
+<div style="overflow-x:auto;">
+<table class="lin-tbl">
+  <tr><th>Source Table (aasbs.*)</th><th></th><th>Target Gold Table</th><th>Notes</th></tr>
+  <tr><td><code>line_item_accepted</code></td><td class="arr">→</td><td><code>oet.fact_obligation_expenditure</code></td><td>Base grain. Joins loa_ledger for amounts.</td></tr>
+  <tr><td><code>loa_ledger</code></td><td class="arr">→</td><td><code>oet.fact_obligation_expenditure</code></td><td>Aggregated committed/obligated per line_item_accepted.</td></tr>
+  <tr><td><code>loa</code></td><td class="arr">→</td><td><code>common.dim_loa</code></td><td>SCD2 — tracks status changes. tracking_num as natural key.</td></tr>
+  <tr><td><code>funding + funding_amendment</code></td><td class="arr">→</td><td><code>common.dim_funding</code></td><td>Latest amendment denormalised into funding dimension.</td></tr>
+  <tr><td><code>award</code></td><td class="arr">→</td><td><code>common.dim_award</code></td><td>Shared across DP1/DP2/DP3. DP3 adds FPDS-specific fields.</td></tr>
+  <tr><td><code>award_mod_company</code></td><td class="arr">→</td><td><code>alt.dim_contractor + fre.dim_fpds_contractor</code></td><td>SCD2. UEI primary; DUNS retained for historical.</td></tr>
+  <tr><td><code>accrual_income_dist</code></td><td class="arr">→</td><td><code>air.fact_accrual_income</code></td><td>Grain anchor for DP4. One row per CLIN × LOA × period.</td></tr>
+  <tr><td><code>accrual_income</code></td><td class="arr">→</td><td><code>air.fact_accrual_income</code></td><td>Parent record — calculated_income_amt, line_item_accepted_id.</td></tr>
+  <tr><td><code>transmit_accrual_income_acct_line</code></td><td class="arr">→</td><td><code>air.fact_accrual_income</code></td><td>BAAR transmitted amounts — SUM per dist (Q4 design decision).</td></tr>
+  <tr><td><code>award_mod</code></td><td class="arr">→</td><td><code>fre.fact_fpds_transaction</code></td><td>One mod = one FPDS CAR. action_obligation_amt via loa_ledger bridge.</td></tr>
+  <tr><td><code>acquisition + acquisition_plan</code></td><td class="arr">→</td><td><code>alt.dim_acquisition</code></td><td>Pre-award planning. IGCE and competition type for cycle time analytics.</td></tr>
+  <tr><td><code>solicit + solicit_response</code></td><td class="arr">→</td><td><code>smi.fact_solicit_response</code></td><td>Includes non-winning responses for price benchmarking.</td></tr>
+  <tr><td><code>billing_summary + aac_envelope</code></td><td class="arr">→</td><td><code>tpp.fact_transmission_event</code></td><td>Treasury transmission events with Pegasys status.</td></tr>
+  <tr><td><code>ia + ia_amendment</code></td><td class="arr">→</td><td><code>iat.fact_ia_amendment</code></td><td>Full amendment history. common.dim_ia holds current state.</td></tr>
+  <tr><td><code>chronology_event + central_collab</code></td><td class="arr">→</td><td><code>cat.fact_lifecycle_event</code></td><td>Complete decision audit trail across all entities.</td></tr>
+  <tr><td><code>assist.users + aasbs.*_role</code></td><td class="arr">→</td><td><code>wpr.fact_role_assignment</code></td><td>Role assignments: CO, COR, FMA, PM per entity.</td></tr>
+  <tr><td><code>61 × aasbs.lu_*</code></td><td class="arr">→</td><td><code>ref.lu_* (61 tables)</code></td><td>Conformed reference data — versioned decode tables.</td></tr>
+</table>
+</div>
+</div><!-- /#detail-lineage -->
+
+</div><!-- /.page -->
+</div><!-- /#tab-detail -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TAB 3 — DEPENDENCY GRAPH
+════════════════════════════════════════════════════════════════════════ -->
+<div id="tab-dependency" class="tab-panel">
+<div class="page">
+<div class="dep-wrap">
+  <h3>Cross-Product Dependency Graph</h3>
+  <p>Shows how DP1–DP11 relate to each other through shared dimensions, data enrichment flows, and downstream consumption. DP1 is the foundational product — it owns all seven conformed shared dimensions consumed by every other financial product.</p>
+  <div class="dep-legend">
+    <div class="dl-item"><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="#1a2744" stroke-width="2.5" marker-end="url(#a)"/></svg><span>Owns / produces</span></div>
+    <div class="dl-item"><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="#1e5fa8" stroke-width="1.5" stroke-dasharray="4,3"/></svg><span>Reads shared dim</span></div>
+    <div class="dl-item"><svg width="30" height="10"><line x1="0" y1="5" x2="15" y2="5" stroke="#b03030" stroke-width="2"/><line x1="15" y1="5" x2="30" y2="5" stroke="#b03030" stroke-width="2"/><circle cx="15" cy="5" r="3" fill="#b03030"/></svg><span>Bidirectional enrichment</span></div>
+    <div class="dl-item"><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="#6b7a99" stroke-width="1" stroke-dasharray="2,2"/></svg><span>Reference data lookup</span></div>
+  </div>
+  <svg id="dep-svg" viewBox="0 0 1060 580" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:1060px;display:block;margin:0 auto;">
+    <defs>
+      <marker id="arw" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#1a2744"/></marker>
+      <marker id="arw-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#1e5fa8"/></marker>
+      <marker id="arw-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#b03030"/></marker>
+      <marker id="arw-grey" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9ba8c2"/></marker>
+      <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%"><feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity=".12"/></filter>
+    </defs>
+
+    <!-- Phase bands -->
+    <rect x="10" y="40" width="175" height="500" rx="10" fill="#fff8e8" opacity=".5"/>
+    <text x="97" y="60" text-anchor="middle" font-size="10" font-weight="700" fill="#a06000" letter-spacing=".8">PRE-AWARD</text>
+    <rect x="195" y="40" width="175" height="500" rx="10" fill="#edf2fc" opacity=".5"/>
+    <text x="283" y="60" text-anchor="middle" font-size="10" font-weight="700" fill="#1e5fa8" letter-spacing=".8">AWARD</text>
+    <rect x="380" y="40" width="240" height="500" rx="10" fill="#eaf6f0" opacity=".5"/>
+    <text x="500" y="60" text-anchor="middle" font-size="10" font-weight="700" fill="#2a7d4f" letter-spacing=".8">POST-AWARD</text>
+    <rect x="630" y="40" width="175" height="500" rx="10" fill="#f3eeff" opacity=".5"/>
+    <text x="717" y="60" text-anchor="middle" font-size="10" font-weight="700" fill="#5e3c8f" letter-spacing=".8">CROSS-CUTTING</text>
+    <rect x="815" y="40" width="235" height="500" rx="10" fill="#f0f3f9" opacity=".5"/>
+    <text x="932" y="60" text-anchor="middle" font-size="10" font-weight="700" fill="#6b7a99" letter-spacing=".8">REFERENCE</text>
+
+    <!-- DP node helper: group of rect + two text lines -->
+    <!-- DP7: Pre-Award -->
+    <g filter="url(#shadow)"><rect x="25" y="100" width="155" height="62" rx="10" fill="#fff8e8" stroke="#c9a227" stroke-width="2"/></g>
+    <text x="103" y="120" text-anchor="middle" font-size="9" font-weight="800" fill="#c9a227">DP7</text>
+    <text x="103" y="133" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Solicitation &amp;</text>
+    <text x="103" y="146" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Market Intelligence</text>
+    <text x="103" y="158" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.smi</text>
+
+    <!-- DP9: Pre-Award/Award -->
+    <g filter="url(#shadow)"><rect x="25" y="210" width="155" height="62" rx="10" fill="#edf2fc" stroke="#0a4d8c" stroke-width="2"/></g>
+    <text x="103" y="230" text-anchor="middle" font-size="9" font-weight="800" fill="#0a4d8c">DP9</text>
+    <text x="103" y="243" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">IA Lifecycle &amp;</text>
+    <text x="103" y="256" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Amendment Tracker</text>
+    <text x="103" y="268" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.iat</text>
+
+    <!-- DP2: Full Lifecycle -->
+    <g filter="url(#shadow)"><rect x="205" y="100" width="155" height="62" rx="10" fill="#eaf6f0" stroke="#0d7377" stroke-width="2"/></g>
+    <text x="283" y="120" text-anchor="middle" font-size="9" font-weight="800" fill="#0d7377">DP2</text>
+    <text x="283" y="133" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Full Award</text>
+    <text x="283" y="146" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Lifecycle Tracker</text>
+    <text x="283" y="158" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.alt</text>
+
+    <!-- DP3: Award/FPDS -->
+    <g filter="url(#shadow)"><rect x="205" y="210" width="155" height="62" rx="10" fill="#fff3e0" stroke="#e07b27" stroke-width="2"/></g>
+    <text x="283" y="230" text-anchor="middle" font-size="9" font-weight="800" fill="#e07b27">DP3</text>
+    <text x="283" y="243" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">FPDS-NG</text>
+    <text x="283" y="256" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Reporting Extract</text>
+    <text x="283" y="268" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.fre</text>
+
+    <!-- DP6: Award/Post-Award -->
+    <g filter="url(#shadow)"><rect x="205" y="320" width="155" height="62" rx="10" fill="#f3eeff" stroke="#5e3c8f" stroke-width="2"/></g>
+    <text x="283" y="340" text-anchor="middle" font-size="9" font-weight="800" fill="#5e3c8f">DP6</text>
+    <text x="283" y="353" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">CLIN Pricing &amp;</text>
+    <text x="283" y="366" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Service Charge</text>
+    <text x="283" y="378" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.psc</text>
+
+    <!-- DP1: Financial Foundation (LARGE, centered) -->
+    <g filter="url(#shadow)"><rect x="388" y="185" width="230" height="90" rx="12" fill="#edf2fc" stroke="#1e5fa8" stroke-width="3"/></g>
+    <text x="503" y="208" text-anchor="middle" font-size="9" font-weight="800" fill="#1e5fa8">DP1 · FOUNDATION</text>
+    <text x="503" y="223" text-anchor="middle" font-size="11" font-weight="700" fill="#1a2744">Obligation &amp; Expenditure</text>
+    <text x="503" y="238" text-anchor="middle" font-size="11" font-weight="700" fill="#1a2744">Tracker</text>
+    <text x="503" y="253" text-anchor="middle" font-size="8.5" fill="#1e5fa8">Owns 7 shared dims · assist_catalog.oet + common</text>
+    <text x="503" y="266" text-anchor="middle" font-size="8" fill="#6b7a99">dim_date · dim_agency · dim_ia · dim_award · dim_line_item · dim_loa · dim_funding</text>
+
+    <!-- DP4: Post-Award Accrual -->
+    <g filter="url(#shadow)"><rect x="395" y="340" width="155" height="62" rx="10" fill="#edf7f1" stroke="#2a7d4f" stroke-width="2"/></g>
+    <text x="473" y="360" text-anchor="middle" font-size="9" font-weight="800" fill="#2a7d4f">DP4</text>
+    <text x="473" y="373" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Accrual Income &amp;</text>
+    <text x="473" y="386" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Revenue Tracker</text>
+    <text x="473" y="398" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.air</text>
+
+    <!-- DP5: Post-Award Treasury -->
+    <g filter="url(#shadow)"><rect x="565" y="340" width="155" height="62" rx="10" fill="#edf7f1" stroke="#155d3e" stroke-width="2"/></g>
+    <text x="643" y="360" text-anchor="middle" font-size="9" font-weight="800" fill="#155d3e">DP5</text>
+    <text x="643" y="373" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Treasury Transmission</text>
+    <text x="643" y="386" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">&amp; Payment Pipeline</text>
+    <text x="643" y="398" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.tpp</text>
+
+    <!-- DP8: Cross-Cutting Workforce -->
+    <g filter="url(#shadow)"><rect x="640" y="100" width="155" height="62" rx="10" fill="#fff3e0" stroke="#a04010" stroke-width="2"/></g>
+    <text x="718" y="120" text-anchor="middle" font-size="9" font-weight="800" fill="#a04010">DP8</text>
+    <text x="718" y="133" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Workforce &amp;</text>
+    <text x="718" y="146" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Personnel Registry</text>
+    <text x="718" y="158" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.wpr</text>
+
+    <!-- DP10: Cross-Cutting Audit -->
+    <g filter="url(#shadow)"><rect x="640" y="210" width="155" height="62" rx="10" fill="#fff0f0" stroke="#b03030" stroke-width="2"/></g>
+    <text x="718" y="230" text-anchor="middle" font-size="9" font-weight="800" fill="#b03030">DP10</text>
+    <text x="718" y="243" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">Collaboration, Review</text>
+    <text x="718" y="256" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a2744">&amp; Audit Trail</text>
+    <text x="718" y="268" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.cat</text>
+
+    <!-- DP11: Reference -->
+    <g filter="url(#shadow)"><rect x="825" y="145" width="215" height="170" rx="12" fill="#f0f3f9" stroke="#6b7a99" stroke-width="2" stroke-dasharray="6,3"/></g>
+    <text x="933" y="168" text-anchor="middle" font-size="9" font-weight="800" fill="#6b7a99">DP11 · REFERENCE</text>
+    <text x="933" y="184" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1a2744">Conformed Reference</text>
+    <text x="933" y="199" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1a2744">Data Catalog</text>
+    <text x="933" y="218" text-anchor="middle" font-size="8" fill="#6b7a99">assist_catalog.ref</text>
+    <text x="933" y="233" text-anchor="middle" font-size="8" fill="#6b7a99">61 conformed lookup tables</text>
+    <text x="933" y="248" text-anchor="middle" font-size="8" fill="#6b7a99">Self-service decodes for all DPs</text>
+    <text x="933" y="268" text-anchor="middle" font-size="8" fill="#6b7a99">↔ consumed by DP1–DP10</text>
+    <text x="933" y="290" text-anchor="middle" font-size="8.5" font-weight="600" fill="#6b7a99">No upstream dependencies</text>
+    <text x="933" y="307" text-anchor="middle" font-size="8" fill="#6b7a99">aasbs.lu_* · aasbs_transmit.lu_*</text>
+
+    <!-- ─── ARROWS ─────────────────────────────────────── -->
+
+    <!-- DP1 → DP2 (shared dims) dashed blue -->
+    <path d="M 388,220 L 360,175" stroke="#1e5fa8" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arw-blue)"/>
+    <!-- DP1 → DP3 (shared dims) -->
+    <path d="M 388,250 L 360,255" stroke="#1e5fa8" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arw-blue)"/>
+    <!-- DP1 → DP6 (shared dims) -->
+    <path d="M 388,265 L 360,360" stroke="#1e5fa8" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arw-blue)"/>
+    <!-- DP1 → DP7 (shared dims) -->
+    <path d="M 388,210 L 180,145" stroke="#1e5fa8" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arw-blue)"/>
+    <!-- DP1 → DP9 (shared dims) -->
+    <path d="M 388,230 L 180,250" stroke="#1e5fa8" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arw-blue)"/>
+    <!-- DP1 → DP8 (shared dims) -->
+    <path d="M 618,220 L 640,145" stroke="#1e5fa8" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arw-blue)"/>
+    <!-- DP1 → DP10 (shared dims) -->
+    <path d="M 618,240 L 640,245" stroke="#1e5fa8" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arw-blue)"/>
+    <!-- DP1 → DP5 (shared dims) -->
+    <path d="M 570,275 L 630,360" stroke="#1e5fa8" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arw-blue)"/>
+
+    <!-- DP4 ↔ DP1 bidirectional enrichment (red, solid) -->
+    <path d="M 473,340 L 473,280" stroke="#b03030" stroke-width="2" fill="none" marker-end="url(#arw-red)"/>
+    <path d="M 463,280 L 463,340" stroke="#b03030" stroke-width="2" fill="none" marker-end="url(#arw-red)"/>
+    <text x="428" y="318" font-size="8" fill="#b03030" font-weight="600">↺ enriches</text>
+    <text x="428" y="328" font-size="8" fill="#b03030" font-weight="600">accrued_amt</text>
+
+    <!-- DP7 → DP2 (solicitation is input to lifecycle) -->
+    <path d="M 180,128 L 205,130" stroke="#1a2744" stroke-width="1.5" fill="none" marker-end="url(#arw)"/>
+
+    <!-- DP9 → DP1 (IA lifecycle context) -->
+    <path d="M 180,234 L 388,220" stroke="#1a2744" stroke-width="1.5" fill="none" marker-end="url(#arw)"/>
+
+    <!-- DP2 → DP6 (CLIN context feeds pricing) -->
+    <path d="M 283,162 L 283,320" stroke="#1a2744" stroke-width="1.5" fill="none" marker-end="url(#arw)"/>
+
+    <!-- DP11 → all (grey dashed, representative lines) -->
+    <path d="M 825,230 L 795,240" stroke="#9ba8c2" stroke-width="1" stroke-dasharray="2,2" fill="none" marker-end="url(#arw-grey)"/>
+    <text x="830" y="130" font-size="8" fill="#6b7a99">Reference lookups</text>
+    <text x="830" y="142" font-size="8" fill="#6b7a99">consumed by all DPs</text>
+    <path d="M 825,200 C 780,150 680,130 618,200" stroke="#9ba8c2" stroke-width="1" stroke-dasharray="2,2" fill="none" marker-end="url(#arw-grey)"/>
+
+    <!-- Lifecycle flow arrow at top -->
+    <path d="M 40,530 L 800,530" stroke="#dce3ef" stroke-width="1.5" fill="none" marker-end="url(#arw)"/>
+    <text x="420" y="548" text-anchor="middle" font-size="9" fill="#9ba8c2" font-weight="600">ASSIST Acquisition Lifecycle Flow →</text>
+  </svg>
+</div>
+
+<!-- Regulatory section -->
+<div class="section-hdr" style="margin-top:3rem;">
+  <div class="icon" style="background:#fff8e8;color:var(--gold);">⚖️</div>
+  <div><h2>Regulatory &amp; Standards Mapping</h2><div class="sub">Federal statutes, OMB circulars, and accounting standards informing the data model</div></div>
+</div>
+<div class="reg-grid">
+  <div class="reg-card"><div class="ref">FAR 4.604</div><div class="title">FPDS Reporting Requirements</div><p>3 business-day submission mandate. Drives fact_fpds_transaction grain and v_fpds_submission_queue SLA view (DP3).</p></div>
+  <div class="reg-card"><div class="ref">FASAB SFFAS 1</div><div class="title">Accounting for Selected Assets &amp; Liabilities</div><p>Obligation accounting. Drives committed → certified → obligated → expended progression in fact_obligation_expenditure (DP1).</p></div>
+  <div class="reg-card"><div class="ref">FASAB SFFAS 7</div><div class="title">Revenue Recognition</div><p>Accrual income recognition at USSGL 5000-level. Implemented in DP4 (Accrual Income Reporter) and enriched back to DP1.accrued_amt.</p></div>
+  <div class="reg-card"><div class="ref">OMB Circular A-11 §132</div><div class="title">UDO Review Requirements</div><p>Annual UDO review. v_udo_aging (DP1) implements aging buckets (Active, &lt;1yr, 1-2yr, &gt;2yr) required for OMB submission.</p></div>
+  <div class="reg-card"><div class="ref">Anti-Deficiency Act (31 U.S.C. §1341)</div><div class="title">No Obligation Beyond Appropriations</div><p>LOA-level grain + TAS on dim_loa ensures every obligation is traceable to a specific appropriation and fiscal year (DP1, DP9).</p></div>
+  <div class="reg-card"><div class="ref">Prompt Payment Act (31 U.S.C. §3901)</div><div class="title">30-Day Payment Requirement</div><p>Invoice-to-payment SLA monitoring. DP5 Treasury Pipeline tracks Pegasys transmission lag per invoice.</p></div>
+  <div class="reg-card"><div class="ref">DATA Act / FFATA</div><div class="title">Federal Spending Transparency</div><p>v_fpds_usaspending_extract (DP3) columns named per DAIMS v2.0 schema for API push to USASpending.gov.</p></div>
+  <div class="reg-card"><div class="ref">FAR 4.804 + FAR Part 17.5</div><div class="title">Closeout &amp; Interagency Acquisitions</div><p>dim_closeout (DP2) checklist structure from FAR 4.804. dim_ia instrument types from FAR Part 17.5 (GT&amp;C, IAA, Economy Act).</p></div>
+  <div class="reg-card"><div class="ref">FAR 1.602-2</div><div class="title">COR Delegation Requirements</div><p>DP8 Workforce Registry tracks written COR delegation status across all awards — mandatory per FAR 1.602-2.</p></div>
+</div>
+
+</div><!-- /.page -->
+</div><!-- /#tab-dependency -->
+
+<footer>
+  <strong>ASSIST OCFO — Data Product Catalog</strong><br/>
+  11 Data Products · Databricks Unity Catalog · Delta Lake · Domain-Driven Design · ASSIST Acquisition Lifecycle<br/>
+  assist_catalog — oet · alt · fre · air · tpp · psc · smi · wpr · iat · cat · ref · common · ref
+</footer>
+
+<script>
+mermaid.initialize({startOnLoad:true,theme:"neutral",er:{diagramPadding:20}});
+// Store original source text for re-render on tab switch
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".mermaid").forEach(el => {
+    el.setAttribute("data-mermaid-src", el.textContent);
+  });
+});
+
+function switchTab(id, btn) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-"+id).classList.add("active");
+  btn.classList.add("active");
+  if (id === "detail") {
+    // Reset processed flag so mermaid re-renders diagrams that were hidden on init
+    setTimeout(() => {
+      document.querySelectorAll("#tab-detail .mermaid").forEach(el => {
+        el.removeAttribute("data-processed");
+        // Clear any previous render to avoid duplicates
+        if (el.querySelector("svg")) {
+          const src = el.getAttribute("data-mermaid-src") || el.textContent;
+          el.innerHTML = src;
+        }
+      });
+      mermaid.run({nodes: document.querySelectorAll("#tab-detail .mermaid")});
+    }, 50);
+  }
+}
+
+// Filter logic: phase AND schema (if both set, must match both)
+let activePhase = "all";
+let activeSchema = "all";
+
+function applyFilters() {
+  document.querySelectorAll(".detail-dp").forEach(dp => {
+    const phases = (dp.dataset.phase || "").split(" ");
+    const schemas = (dp.dataset.schema || "").split(" ");
+    const matchPhase = activePhase === "all" || phases.includes(activePhase);
+    const matchSchema = activeSchema === "all" || schemas.includes(activeSchema);
+    dp.classList.toggle("hidden", !(matchPhase && matchSchema));
+  });
+}
+
+document.querySelectorAll(".f-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const filter = btn.dataset.filter;
+    const val = btn.dataset.val;
+    if (filter === "phase") {
+      document.querySelectorAll("[data-filter=phase]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activePhase = val;
+    } else if (filter === "schema") {
+      document.querySelectorAll("[data-filter=schema]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeSchema = val;
+    }
+    applyFilters();
+  });
+});
+
+function clearFilters() {
+  activePhase = "all";
+  activeSchema = "all";
+  document.querySelectorAll("[data-filter=phase]").forEach(b => b.classList.toggle("active", b.dataset.val === "all"));
+  document.querySelectorAll("[data-filter=schema]").forEach(b => b.classList.toggle("active", b.dataset.val === "all"));
+  applyFilters();
+}
+</script>
+</body>
+</html>
